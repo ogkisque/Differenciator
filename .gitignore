@@ -1,0 +1,6 @@
+*.exe
+obj
+Graph.jpg
+*.dot
+.vscode
+
