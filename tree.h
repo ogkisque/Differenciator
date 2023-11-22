@@ -34,10 +34,13 @@
 #define TREE_CTOR(tree) \
         tree_ctor (tree, #tree, __FILE__, __func__, __LINE__)
 
+const int MAX_STR_SIZE = 500;
+
 enum Types
 {
     NUM  = 1,
-    OPER = 2
+    OPER = 2,
+    VAR  = 3
 };
 
 enum Opers
@@ -67,19 +70,29 @@ struct Tree
     int         line;
 };
 
+struct ReadStr
+{
+    char    str[MAX_STR_SIZE];
+    size_t  pos;
+    size_t  size;
+};
+
 Error   tree_ctor           (Tree* tree, const char* name, const char* file, const char* func, int line);
 Error   tree_dtor           (Tree* tree);
-Error   nodes_print         (Node* node, FILE* file);
-void    val_to_str          (Node* node, char* str);
+double  eval                (const Node* node, double x);
+Error   read_file           (FILE* file, ReadStr* str);
+Error   nodes_print         (const Node* node, FILE* file);
+void    val_to_str          (const Node* node, char* str);
 Error   nodes_read          (Tree* tree, Node** node, FILE* file);
 Error   read_value          (FILE* file, Node** node);
-void    tree_graph_dump     (Tree* tree, Error error);
+void    tree_graph_dump     (const Tree* tree, Error error);
 Error   new_node            (Types type, double value, Node** adres);
 Error   node_ctor           (Types type, double value, Node* node);
 void    nodes_dtor          (Node* node);
-Error   tree_verify         (Tree* tree);
-void    tree_dump           (Tree* tree, Error error);
-void    nodes_graph_dump    (Node* node, size_t counter);
-void    error_graph_dump    (Tree* tree, Error error);
+Error   tree_verify         (const Tree* tree);
+void    tree_dump           (const Tree* tree, Error error);
+void    nodes_graph_dump    (const Node* node, size_t counter);
+void    error_graph_dump    (const Tree* tree, Error error);
 void    print_error         (Error error);
+
 #endif //TREE_HEADER

@@ -5,7 +5,7 @@
         return Error {code, __LINE__, __FILE__, __func__, message}
 
 enum Error_codes
-{ // yaroslav mudak
+{
     CORRECT =           0,
     NULL_POINTER =      1,
     MEM_ALLOC =         2,

@@ -3,7 +3,7 @@
 #include "Dotter.h"
 
 const char* NAME_DOT        = "pic.dot";
-const int   MAX_TEXT_SIZE   = 40;
+const int   MAX_TEXT_SIZE   = 100;
 const int   MAX_SIZE        = 100;
 
 Error new_node (Types type, double value, Node** adres)
@@ -69,14 +69,14 @@ void nodes_dtor (Node* node)
     node = NULL;
 }
 
-Error tree_verify (Tree* tree)
+Error tree_verify (const Tree* tree)
 {
     if (!tree)                                      RETURN_ERROR(NULL_POINTER,      "Null pointer of tree.");
     if (!tree->file || !tree->func || !tree->name)  RETURN_ERROR(INCOR_PARAMS,      "Null pointer of parameters of tree.");
     RETURN_ERROR(CORRECT, "");
 }
 
-void tree_dump (Tree* tree, Error error)
+void tree_dump (const Tree* tree, Error error)
 {
     printf (RED_COL);
     printf ("-------------------------------------\n");
@@ -102,7 +102,7 @@ void tree_dump (Tree* tree, Error error)
     printf (OFF_COL);
 }
 
-Error nodes_print (Node* node, FILE* file)
+Error nodes_print (const Node* node, FILE* file)
 {
     if (!file)
         RETURN_ERROR(NULL_POINTER, "Null pointer of file.");
@@ -120,16 +120,22 @@ Error nodes_print (Node* node, FILE* file)
 
     nodes_print (node->right, file);
     if (node->type == OPER)
-        fprintf (file, ") ");
+        fprintf (file, ")");
 
     RETURN_ERROR(CORRECT, "");
 }
 
-void val_to_str (Node* node, char* str)
+void val_to_str (const Node* node, char* str)
 {
     if (node->type == NUM)
     {
         sprintf (str, "%.3lf", node->value);
+        return;
+    }
+
+    if (node->type == VAR)
+    {
+        sprintf (str, "x");
         return;
     }
 
@@ -138,16 +144,16 @@ void val_to_str (Node* node, char* str)
         switch ((int) node->value)
         {
             case ADD:
-                strcpy (str, "+");
+                strcpy (str, " + ");
                 return;
             case MUL:
-                strcpy (str, "*");
+                strcpy (str, " * ");
                 return;
             case SUB:
-                strcpy (str, "-");
+                strcpy (str, " - ");
                 return;
             case DIV:
-                strcpy (str, "/");
+                strcpy (str, " / ");
                 return;
             default:
                 return;
@@ -161,7 +167,7 @@ Error nodes_read (Tree* tree, Node** node, FILE* file)
         RETURN_ERROR(NULL_POINTER, "Null pointer of file.");
 
     char text[MAX_SIZE] = "";
-    fscanf (file, "%s ", text);
+    fscanf (file, "%s", text);
     if (strcmp (text, "(") != 0)
     {
         tree->size++;
@@ -176,7 +182,7 @@ Error nodes_read (Tree* tree, Node** node, FILE* file)
     PARSE_ERROR_WITHOUT_TREE(error);
 
     nodes_read (tree, &((*node)->right), file);
-    fscanf (file, "%s ", text);
+    fscanf (file, "%s", text);
     return error;
 }
 
@@ -189,6 +195,13 @@ Error read_value (FILE* file, Node** node)
     {
         (*node)->type = NUM;
         (*node)->value = value;
+        RETURN_ERROR(CORRECT, "");
+    }
+
+    if (strcmp (text, "x") == 0)
+    {
+        (*node)->type = VAR;
+        (*node)->value = 0;
         RETURN_ERROR(CORRECT, "");
     }
 
@@ -207,12 +220,38 @@ Error read_value (FILE* file, Node** node)
     RETURN_ERROR(CORRECT, "");
 }
 
-double eval (const Node* node)
+Error read_file (FILE* file, ReadStr* str)
+{
+    if (!file)
+        RETURN_ERROR(NULL_POINTER, "Null pointer of file.");
+
+    str->size = fread (str->str, sizeof (char), MAX_STR_SIZE, file);
+    str->pos = 0;
+    RETURN_ERROR (CORRECT, "");
+}
+
+double eval (const Node* node, double x)
 {
     if (!node)
         return NAN;
 
+    if (node->type == NUM)
+        return node->value;
 
+    if (node->type == VAR)
+        return x;
+
+    double left_val = eval (node->left, x);
+    double right_val = eval (node->right, x);
+
+    switch ((int) node->value)
+    {
+        case ADD: return left_val + right_val;
+        case MUL: return left_val * right_val;
+        case SUB: return left_val - right_val;
+        case DIV: return left_val / right_val;
+        default:  return 0;
+    }
 }
 
 void print_error (Error error)
@@ -225,7 +264,7 @@ void print_error (Error error)
             error.file, error.func, error.line);
 }
 
-void tree_graph_dump (Tree* tree, Error error)
+void tree_graph_dump (const Tree* tree, Error error)
 {
     dtBegin (NAME_DOT);
     nodes_graph_dump (tree->root, 1);
@@ -235,7 +274,7 @@ void tree_graph_dump (Tree* tree, Error error)
     dtRender (NAME_DOT);
 }
 
-void nodes_graph_dump (Node* node, size_t counter)
+void nodes_graph_dump (const Node* node, size_t counter)
 {
     char text[MAX_TEXT_SIZE] = "";
     dtNodeStyle ().shape        ("box")
@@ -245,6 +284,10 @@ void nodes_graph_dump (Node* node, size_t counter)
     dtLinkStyle ().style        ("bold")
                   .color        ("#4682B4");
 
+    if (node->type == OPER)
+        dtNodeStyle ().fillcolor ("#70FC48");
+    else if (node->type == VAR)
+        dtNodeStyle ().fillcolor ("#4871FC");
     val_to_str (node, text);
     dtNode ((int) counter, text);
     if (node->left)
@@ -259,7 +302,7 @@ void nodes_graph_dump (Node* node, size_t counter)
     }
 }
 
-void error_graph_dump (Tree* tree, Error error)
+void error_graph_dump (const Tree* tree, Error error)
 {
     char text[MAX_TEXT_SIZE] = "";
     dtNodeStyle ().shape        ("box")
