@@ -19,7 +19,8 @@ enum Error_codes
     CYCLES =            10,
     ELEMS_MORE_SIZE =   11,
     PREV_OF_NEXT =      12,
-    LIST_OVERFLOW =     13
+    LIST_OVERFLOW =     13,
+    POS_MORE_SIZE =     14
 };
 
 struct Error

@@ -83,8 +83,8 @@ double  eval                (const Node* node, double x);
 Error   read_file           (FILE* file, ReadStr* str);
 Error   nodes_print         (const Node* node, FILE* file);
 void    val_to_str          (const Node* node, char* str);
-Error   nodes_read          (Tree* tree, Node** node, FILE* file);
-Error   read_value          (FILE* file, Node** node);
+Error   nodes_read          (Tree* tree, Node** node, ReadStr* str);
+Error   read_value          (ReadStr* str, Node** node);
 void    tree_graph_dump     (const Tree* tree, Error error);
 Error   new_node            (Types type, double value, Node** adres);
 Error   node_ctor           (Types type, double value, Node* node);
@@ -94,5 +94,8 @@ void    tree_dump           (const Tree* tree, Error error);
 void    nodes_graph_dump    (const Node* node, size_t counter);
 void    error_graph_dump    (const Tree* tree, Error error);
 void    print_error         (Error error);
+bool    is_cycles           (Node* node);
+void    get_points          (Node* node, Node* points[], size_t pos);
+int     comparator          (const void* p1, const void* p2);
 
 #endif //TREE_HEADER

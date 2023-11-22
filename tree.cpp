@@ -3,7 +3,7 @@
 #include "Dotter.h"
 
 const char* NAME_DOT        = "pic.dot";
-const int   MAX_TEXT_SIZE   = 100;
+const int   MAX_TEXT_SIZE   = 200;
 const int   MAX_SIZE        = 100;
 
 Error new_node (Types type, double value, Node** adres)
@@ -73,6 +73,7 @@ Error tree_verify (const Tree* tree)
 {
     if (!tree)                                      RETURN_ERROR(NULL_POINTER,      "Null pointer of tree.");
     if (!tree->file || !tree->func || !tree->name)  RETURN_ERROR(INCOR_PARAMS,      "Null pointer of parameters of tree.");
+    if (is_cycles (tree->root))                     RETURN_ERROR(CYCLES,            "There are cycles in tree.");
     RETURN_ERROR(CORRECT, "");
 }
 
@@ -161,60 +162,65 @@ void val_to_str (const Node* node, char* str)
     }
 }
 
-Error nodes_read (Tree* tree, Node** node, FILE* file)
+Error nodes_read (Tree* tree, Node** node, ReadStr* str)
 {
-    if (!file)
-        RETURN_ERROR(NULL_POINTER, "Null pointer of file.");
+    if (!str)
+        RETURN_ERROR(NULL_POINTER, "Null pointer of str.");
+
+    if (str->pos > str->size)
+        RETURN_ERROR(POS_MORE_SIZE, "Position in str is more than its size.");
 
     char text[MAX_SIZE] = "";
-    fscanf (file, "%s", text);
+    sscanf (str->str + str->pos, "%s", text);
     if (strcmp (text, "(") != 0)
-    {
-        tree->size++;
         RETURN_ERROR(CORRECT, "");
-    }
 
+    tree->size++;
+    str->pos += 2;
     Error error = new_node (NUM, 0, node);
 
-    nodes_read (tree, &((*node)->left), file);
+    nodes_read (tree, &((*node)->left), str);
 
-    error = read_value (file, node);
+    error = read_value (str, node);
     PARSE_ERROR_WITHOUT_TREE(error);
 
-    nodes_read (tree, &((*node)->right), file);
-    fscanf (file, "%s", text);
+    nodes_read (tree, &((*node)->right), str);
+    str->pos += 2;
     return error;
 }
 
-Error read_value (FILE* file, Node** node)
+Error read_value (ReadStr* str, Node** node)
 {
     char text[MAX_SIZE] = "";
-    fscanf (file, "%s", text);
+    int num_read = 0;
     double value = 0;
-    if (sscanf (text, "%lf", &value) == 1)
+    if (sscanf (str->str + str->pos, "%lf%n", &value, &num_read) == 1)
     {
         (*node)->type = NUM;
         (*node)->value = value;
+        str->pos += num_read + 1;
         RETURN_ERROR(CORRECT, "");
     }
 
+    sscanf (str->str + str->pos, "%s", text);
     if (strcmp (text, "x") == 0)
     {
         (*node)->type = VAR;
         (*node)->value = 0;
+        str->pos += 2;
         RETURN_ERROR(CORRECT, "");
     }
 
     (*node)->type = OPER;
-    char oper[MAX_SIZE] = "";
-    sscanf (text, "%s", oper);
-    if (strcmp (oper, "+") == 0)
+    sscanf (str->str + str->pos, "%s%n", text, &num_read);
+    str->pos += num_read + 1;
+    if (strcmp (text, "+") == 0)
         (*node)->value = ADD;
-    else if (strcmp (oper, "*") == 0)
+    else if (strcmp (text, "*") == 0)
         (*node)->value = MUL;
-    if (strcmp (oper, "-") == 0)
+    if (strcmp (text, "-") == 0)
         (*node)->value = SUB;
-    if (strcmp (oper, "/") == 0)
+    if (strcmp (text, "/") == 0)
         (*node)->value = DIV;
 
     RETURN_ERROR(CORRECT, "");
@@ -327,4 +333,36 @@ void error_graph_dump (const Tree* tree, Error error)
                 error.message, error.code, error.file, error.func, error.line);
 
     dtNode (0, text);
+}
+
+bool is_cycles (Node* node)
+{
+    Node* points[MAX_SIZE] = {};
+    get_points (node, points, 0);
+
+    qsort (points, MAX_SIZE, sizeof (Node*), comparator);
+    for (int i = 1; points[i]; i++)
+        if (points[i - 1] == points[i])
+            return true;
+
+    return false;
+}
+
+void get_points (Node* node, Node* points[], size_t pos)
+{
+    if (!node)
+        return;
+
+    points[pos] = node;
+    get_points (node->left, points, pos * 2 + 1);
+    get_points (node->right, points, pos * 2 + 2);
+}
+
+int comparator (const void* p1, const void* p2)
+{
+    if ((const Node*) p1 > (const Node*) p2)
+        return 1;
+    else if ((const Node*) p1 < (const Node*) p2)
+        return -1;
+    return 0;
 }
