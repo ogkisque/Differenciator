@@ -2,9 +2,11 @@
 
 #include "Dotter.h"
 
-const char* NAME_DOT        = "pic.dot";
-const int   MAX_TEXT_SIZE   = 200;
-const int   MAX_SIZE        = 100;
+const char*     NAME_DOT        = "pic.dot";
+const int       MAX_TEXT_SIZE   = 200;
+const int       MAX_SIZE        = 100;
+const int       VAR_DEF_VAL     = 2;
+const double    EPS             = 1e-5;
 
 Error new_node (Types type, double value, Node** adres)
 {
@@ -206,7 +208,7 @@ Error read_value (ReadStr* str, Node** node)
     if (strcmp (text, "x") == 0)
     {
         (*node)->type = VAR;
-        (*node)->value = 0;
+        (*node)->value = VAR_DEF_VAL;
         str->pos += 2;
         RETURN_ERROR(CORRECT, "");
     }
@@ -342,8 +344,10 @@ bool is_cycles (Node* node)
 
     qsort (points, MAX_SIZE, sizeof (Node*), comparator);
     for (int i = 1; points[i]; i++)
+    {
         if (points[i - 1] == points[i])
             return true;
+    }
 
     return false;
 }
@@ -365,4 +369,135 @@ int comparator (const void* p1, const void* p2)
     else if ((const Node*) p1 < (const Node*) p2)
         return -1;
     return 0;
+}
+
+Node* create_node (Types type, double value, Node* left, Node* right)
+{
+    Node* node = NULL;
+    new_node (type, value, &node);
+    node->left = left;
+    node->right = right;
+    return node;
+}
+
+Node* copy_node (const Node* old_node)
+{
+    if (!old_node)
+        return NULL;
+
+    Node* node = NULL;
+    new_node (old_node->type, old_node->value, &node);
+    node->left = copy_node (old_node->left);
+    node->right = copy_node (old_node->right);
+    return node;
+}
+
+Node* dif (const Node* node)
+{
+    if (!node)
+        return NULL;
+
+    if (node->type == NUM)
+        return create_node (NUM, 0, NULL, NULL);
+
+    if (node->type == VAR)
+        return create_node (NUM, 1, NULL, NULL);
+
+    switch ((int) node->value)
+    {
+        case ADD:
+            return create_node (OPER, ADD, dif (node->left), dif (node->right));
+        case SUB:
+            return create_node (OPER, SUB, dif (node->left), dif (node->right));
+        case MUL:
+            return create_node (OPER, ADD,
+                                create_node (OPER, MUL, dif (node->left), copy_node (node->right)),
+                                create_node (OPER, MUL, copy_node (node->left), dif (node->right)));
+        case DIV:
+            return create_node (OPER, DIV,
+                                create_node (OPER, SUB,
+                                             create_node (OPER, MUL, dif (node->left), copy_node (node->right)),
+                                             create_node (OPER, MUL, copy_node (node->left), dif (node->right))),
+                                create_node (OPER, MUL, copy_node (node->right), copy_node (node->right)));
+        default:
+            printf ("Getting into default in switch!\n");
+            return NULL;
+    }
+}
+
+Node* simple (Node* node)
+{
+    if (!node)
+        return NULL;
+
+    if (node->type == NUM || node->type == VAR)
+        return node;
+
+    node->left = simple (node->left);
+    node->right = simple (node->right);
+
+    if (node->left->type == NUM && node->right->type == NUM)
+    {
+        node->type = NUM;
+        switch ((int) node->value)
+        {
+            case ADD:
+                node->value = node->left->value + node->right->value;
+                break;
+            case MUL:
+                node->value = node->left->value * node->right->value;
+                break;
+            case SUB:
+                node->value = node->left->value - node->right->value;
+                break;
+            case DIV:
+                node->value = node->left->value / node->right->value;
+                break;
+            default:
+                printf ("Getting into default in switch!\n");
+                break;
+        }
+
+        nodes_dtor (node->left);
+        nodes_dtor (node->right);
+
+        node->left = NULL;
+        node->right = NULL;
+        return node;
+    }
+
+    if ((int) node->value == MUL && (is_zero (node->left->value) || is_zero (node->right->value)))
+    {
+        node->type = NUM;
+        node->value = 0;
+
+        nodes_dtor (node->left);
+        nodes_dtor (node->right);
+
+        node->left = NULL;
+        node->right = NULL;
+        return node;
+    }
+
+    if ((int) node->value == MUL &&
+        ((is_zero (node->left->value - 1) && node->left->type == NUM)
+        || (is_zero (node->right->value - 1) && node->right->type == NUM)))
+    {
+        node->type = VAR;
+        node->value = VAR_DEF_VAL;
+
+        nodes_dtor (node->left);
+        nodes_dtor (node->right);
+
+        node->left = NULL;
+        node->right = NULL;
+        return node;
+    }
+
+    return node;
+}
+
+bool is_zero (double x)
+{
+    return (abs (x) < EPS);
 }

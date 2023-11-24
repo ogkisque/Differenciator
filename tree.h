@@ -97,5 +97,10 @@ void    print_error         (Error error);
 bool    is_cycles           (Node* node);
 void    get_points          (Node* node, Node* points[], size_t pos);
 int     comparator          (const void* p1, const void* p2);
+Node*   create_node         (Types type, double value, Node* left, Node* right);
+Node*   copy_node           (const Node* old_node);
+Node*   dif                 (const Node* node);
+Node*   simple              (Node* node);
+bool    is_zero             (double x);
 
 #endif //TREE_HEADER
