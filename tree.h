@@ -151,5 +151,11 @@ bool    pow_zero            (Node* node);
 bool    one_pow             (Node* node);
 bool    pow_one             (Node* node, Node** new_simple_node);
 void    del_node            (Node* node);
+void    print_form          (Node* node, FILE* file);
+void    print_latex_begin   (FILE* file);
+void    print_latex_end     (FILE* file);
+void    print_latex_trans   (Node* node, FILE* file);
+void    print_latex_func    (Node* node, FILE* file);
+void    generate_pdf        (const char* file_name);
 
 #endif //TREE_HEADER

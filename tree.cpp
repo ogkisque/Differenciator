@@ -840,7 +840,140 @@ void del_node (Node* node)
     free (node);
 }
 
-void print_latex (Node* node, FILE* file)
+void print_latex_begin (FILE* file)
 {
+    fprintf (file,
+    "\\documentclass[a4paper,12pt]{article}\n"
+    "\\usepackage[T1]{fontenc}\n"
+    "\\usepackage[utf8]{inputenc}\n"
+    "\\usepackage[english,russian]{babel}\n"
+    "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}\n"
+    "\\usepackage[left=10mm, top=10mm, right=10mm, bottom=20mm, nohead, nofoot]{geometry}\n"
+    "\\usepackage{wasysym}\n"
+    "\\author{\\LARGEМерзляков Арсений}\n"
+    "\\title{Производная}\n"
+    "\\pagestyle {empty}\n"
+    "\\begin{document}\n"
+    "\\maketitle\n"
+    "\\begin{flushleft}\n"
+    "\\Large\n");
+}
 
+void print_latex_end (FILE* file)
+{
+    fprintf (file,
+    "\\end{flushleft}\n"
+    "\\end{document}");
+}
+
+void print_latex_trans (Node* node, FILE* file)
+{
+    fprintf (file, "Абсолютно тривиально, что это будет:\n\n$");
+    print_form (node, file);
+    fprintf (file, "$\n\n");
+}
+
+void print_form (Node* node, FILE* file)
+{
+    if (!node)
+        return;
+
+    if (node->type == NUM)
+    {
+        if (node->value < 0)
+            fprintf (file, "(%.3lf)", node->value);
+        else
+            fprintf (file, "%.3lf", node->value);
+        return;
+    }
+
+    if (node->type == VAR)
+    {
+        fprintf (file, "x");
+        return;
+    }
+
+    if (node->type == OPER)
+    {
+        switch ((int) node->value)
+        {
+            case DIV:
+                fprintf (file, " \\dfrac{");
+                print_form (node->left, file);
+                fprintf (file, "}{");
+                print_form (node->right, file);
+                fprintf (file, "} ");
+                break;
+            case MUL:
+                print_form (node->left, file);
+                fprintf (file, " \\cdot ");
+                print_form (node->right, file);
+                break;
+            case ADD:
+                fprintf (file, "(");
+                print_form (node->left, file);
+                fprintf (file, "+");
+                print_form (node->right, file);
+                fprintf (file, ")");
+                break;
+            case SUB:
+                fprintf (file, "(");
+                print_form (node->left, file);
+                fprintf (file, "-");
+                print_form (node->right, file);
+                fprintf (file, ")");
+                break;
+            default:
+                printf ("Getting in default in latex_print!\n");
+                break;
+        }
+    }
+    else if (node->type == FUNC)
+    {
+        switch ((int) node->value)
+        {
+            case COS:
+                fprintf (file, "cos");
+                print_form (node->right, file);
+                break;
+            case SIN:
+                fprintf (file, "sin");
+                print_form (node->right, file);
+                break;
+            case LN:
+                fprintf (file, "\\ln{(");
+                print_form (node->right, file);
+                fprintf (file, ")}");
+                break;
+            case SQRT:
+                fprintf (file, "\\sqrt{");
+                print_form (node->right, file);
+                fprintf (file, "}");
+                break;
+            case POW:
+                fprintf (file, "(");
+                print_form (node->left, file);
+                fprintf (file, ")^{");
+                print_form (node->right, file);
+                fprintf (file, "}");
+                break;
+            default:
+                printf ("Getting in default in latex_print!\n");
+                break;
+        }
+    }
+}
+
+void generate_pdf (const char* file_name)
+{
+    char text[MAX_TEXT_SIZE] = "";
+    sprintf (text, "pdflatex %s", file_name);
+    system (text);
+}
+
+void print_latex_func (Node* node, FILE* file)
+{
+    fprintf (file, "$f(x) = ");
+    print_form (node, file);
+    fprintf (file, "$\n\nПосчитаем производную $f^{'}(x)$\n\n");
 }
