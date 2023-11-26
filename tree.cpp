@@ -3,10 +3,6 @@
 #include "Dotter.h"
 
 const char*     NAME_DOT        = "pic.dot";
-const int       MAX_TEXT_SIZE   = 200;
-const int       MAX_SIZE        = 100;
-const int       VAR_DEF_VAL     = 2;
-const double    EPS             = 1e-5;
 
 Error new_node (Types type, double value, Node** adres)
 {
@@ -62,6 +58,8 @@ Error tree_dtor (Tree* tree)
 
 void nodes_dtor (Node* node)
 {
+    if (!node)
+        return;
     if (node->left)
         nodes_dtor (node->left);
     if (node->right)
@@ -113,7 +111,7 @@ Error nodes_print (const Node* node, FILE* file)
     if (!node)
         RETURN_ERROR(CORRECT, "");
 
-    if (node->type == OPER)
+    if (node->type == OPER || node->type == FUNC)
         fprintf (file, "(");
     nodes_print (node->left, file);
 
@@ -122,7 +120,7 @@ Error nodes_print (const Node* node, FILE* file)
     fprintf (file, "%s", str);
 
     nodes_print (node->right, file);
-    if (node->type == OPER)
+    if (node->type == OPER || node->type == FUNC)
         fprintf (file, ")");
 
     RETURN_ERROR(CORRECT, "");
@@ -142,21 +140,46 @@ void val_to_str (const Node* node, char* str)
         return;
     }
 
+    if (node->type == FUNC)
+    {
+        switch ((int) node->value)
+        {
+            case COS:
+                sprintf (str, "cos ");
+                return;
+            case SIN:
+                sprintf (str, "sin ");
+                return;
+            case SQRT:
+                sprintf (str, "sqrt ");
+                return;
+            case POW:
+                sprintf (str, " ^ ");
+                return;
+            case LN:
+                sprintf (str, "ln ");
+                return;
+            default:
+                printf ("Unknown function!\n");
+                return;
+        }
+    }
+
     if (node->type == OPER)
     {
         switch ((int) node->value)
         {
             case ADD:
-                strcpy (str, " + ");
+                sprintf (str, " + ");
                 return;
             case MUL:
-                strcpy (str, " * ");
+                sprintf (str, " * ");
                 return;
             case SUB:
-                strcpy (str, " - ");
+                sprintf (str, " - ");
                 return;
             case DIV:
-                strcpy (str, " / ");
+                sprintf (str, " / ");
                 return;
             default:
                 return;
@@ -183,17 +206,116 @@ Error nodes_read (Tree* tree, Node** node, ReadStr* str)
 
     nodes_read (tree, &((*node)->left), str);
 
-    error = read_value (str, node);
-    PARSE_ERROR_WITHOUT_TREE(error);
+    read_value (str, node);
 
     nodes_read (tree, &((*node)->right), str);
     str->pos += 2;
     return error;
 }
 
-Error read_value (ReadStr* str, Node** node)
+void read_value (ReadStr* str, Node** node)
+{
+    if (read_num  (str, node)) return;
+    if (read_var  (str, node)) return;
+    if (read_oper (str, node)) return;
+    if (read_func (str, node)) return;
+}
+
+bool read_func (ReadStr* str, Node** node)
 {
     char text[MAX_SIZE] = "";
+    int num_read = 0;
+    sscanf (str->str + str->pos, "%s%n", text, &num_read);
+    bool is_func = false;
+    if (strcmp (text, "cos") == 0)
+    {
+        is_func = true;
+        (*node)->left = NULL;
+        (*node)->value = COS;
+    }
+    else if (strcmp (text, "sin") == 0)
+    {
+        is_func = true;
+        (*node)->left = NULL;
+        (*node)->value = SIN;
+    }
+    else if (strcmp (text, "^") == 0)
+    {
+        is_func = true;
+        (*node)->value = POW;
+    }
+    else if (strcmp (text, "sqrt") == 0)
+    {
+        is_func = true;
+        (*node)->left = NULL;
+        (*node)->value = SQRT;
+    }
+    else if (strcmp (text, "ln") == 0)
+    {
+        is_func = true;
+        (*node)->left = NULL;
+        (*node)->value = LN;
+    }
+
+    if (is_func)
+    {
+        str->pos += num_read + 1;
+        (*node)->type = FUNC;
+    }
+    return is_func;
+}
+
+bool read_oper (ReadStr* str, Node** node)
+{
+    char text[MAX_SIZE] = "";
+    int num_read = 0;
+    sscanf (str->str + str->pos, "%s%n", text, &num_read);
+    bool is_oper = false;
+    if (strcmp (text, "+") == 0)
+    {
+        is_oper = true;
+        (*node)->value = ADD;
+    }
+    else if (strcmp (text, "*") == 0)
+    {
+        is_oper = true;
+        (*node)->value = MUL;
+    }
+    else if (strcmp (text, "-") == 0)
+    {
+        is_oper = true;
+        (*node)->value = SUB;
+    }
+    else if (strcmp (text, "/") == 0)
+    {
+        is_oper = true;
+        (*node)->value = DIV;
+    }
+
+    if (is_oper)
+    {
+        str->pos += num_read + 1;
+        (*node)->type = OPER;
+    }
+    return is_oper;
+}
+
+bool read_var (ReadStr* str, Node** node)
+{
+    char text[MAX_SIZE] = "";
+    sscanf (str->str + str->pos, "%s", text);
+    if (strcmp (text, "x") == 0)
+    {
+        (*node)->type = VAR;
+        (*node)->value = VAR_DEF_VAL;
+        str->pos += 2;
+        return true;
+    }
+    return false;
+}
+
+bool read_num (ReadStr* str, Node** node)
+{
     int num_read = 0;
     double value = 0;
     if (sscanf (str->str + str->pos, "%lf%n", &value, &num_read) == 1)
@@ -201,31 +323,9 @@ Error read_value (ReadStr* str, Node** node)
         (*node)->type = NUM;
         (*node)->value = value;
         str->pos += num_read + 1;
-        RETURN_ERROR(CORRECT, "");
+        return true;
     }
-
-    sscanf (str->str + str->pos, "%s", text);
-    if (strcmp (text, "x") == 0)
-    {
-        (*node)->type = VAR;
-        (*node)->value = VAR_DEF_VAL;
-        str->pos += 2;
-        RETURN_ERROR(CORRECT, "");
-    }
-
-    (*node)->type = OPER;
-    sscanf (str->str + str->pos, "%s%n", text, &num_read);
-    str->pos += num_read + 1;
-    if (strcmp (text, "+") == 0)
-        (*node)->value = ADD;
-    else if (strcmp (text, "*") == 0)
-        (*node)->value = MUL;
-    if (strcmp (text, "-") == 0)
-        (*node)->value = SUB;
-    if (strcmp (text, "/") == 0)
-        (*node)->value = DIV;
-
-    RETURN_ERROR(CORRECT, "");
+    return false;
 }
 
 Error read_file (FILE* file, ReadStr* str)
@@ -252,14 +352,29 @@ double eval (const Node* node, double x)
     double left_val = eval (node->left, x);
     double right_val = eval (node->right, x);
 
-    switch ((int) node->value)
+    if (node->type == OPER)
+        switch ((int) node->value)
+        {
+            case ADD: return left_val + right_val;
+            case MUL: return left_val * right_val;
+            case SUB: return left_val - right_val;
+            case DIV: return left_val / right_val;
+            default:  return 0;
+        }
+    else if (node->type == FUNC)
     {
-        case ADD: return left_val + right_val;
-        case MUL: return left_val * right_val;
-        case SUB: return left_val - right_val;
-        case DIV: return left_val / right_val;
-        default:  return 0;
+        switch ((int) node->value)
+        {
+            case COS:  return cos   (right_val);
+            case SIN:  return sin   (right_val);
+            case POW:  return pow   (left_val, right_val);
+            case SQRT: return sqrt  (right_val);
+            case LN:   return log   (right_val);
+            default:   return       0;
+        }
     }
+    printf ("Error!");
+    return 0;
 }
 
 void print_error (Error error)
@@ -296,6 +411,8 @@ void nodes_graph_dump (const Node* node, size_t counter)
         dtNodeStyle ().fillcolor ("#70FC48");
     else if (node->type == VAR)
         dtNodeStyle ().fillcolor ("#4871FC");
+    else if (node->type == FUNC)
+        dtNodeStyle ().fillcolor ("#F9FF15");
     val_to_str (node, text);
     dtNode ((int) counter, text);
     if (node->left)
@@ -344,10 +461,8 @@ bool is_cycles (Node* node)
 
     qsort (points, MAX_SIZE, sizeof (Node*), comparator);
     for (int i = 1; points[i]; i++)
-    {
         if (points[i - 1] == points[i])
             return true;
-    }
 
     return false;
 }
@@ -403,55 +518,108 @@ Node* dif (const Node* node)
     if (node->type == VAR)
         return create_node (NUM, 1, NULL, NULL);
 
-    switch ((int) node->value)
+    if (node->type == FUNC)
     {
-        case ADD:
-            return create_node (OPER, ADD, dif (node->left), dif (node->right));
-        case SUB:
-            return create_node (OPER, SUB, dif (node->left), dif (node->right));
-        case MUL:
-            return create_node (OPER, ADD,
-                                create_node (OPER, MUL, dif (node->left), copy_node (node->right)),
-                                create_node (OPER, MUL, copy_node (node->left), dif (node->right)));
-        case DIV:
-            return create_node (OPER, DIV,
-                                create_node (OPER, SUB,
-                                             create_node (OPER, MUL, dif (node->left), copy_node (node->right)),
-                                             create_node (OPER, MUL, copy_node (node->left), dif (node->right))),
-                                create_node (OPER, MUL, copy_node (node->right), copy_node (node->right)));
-        default:
-            printf ("Getting into default in switch!\n");
-            return NULL;
+        switch ((int) node->value)
+        {
+            case COS:
+                return _MUL(_MUL(_SIN(NULL, _COPY(_RIGHT)), create_node (NUM, -1, NULL, NULL)),
+                            _D(_COPY(_RIGHT)));
+            case SIN:
+                return _MUL(_COS(NULL, _COPY(_RIGHT)),
+                            _D(_COPY(_RIGHT)));
+            case LN:
+                return _MUL(_DIV(create_node (NUM, 1, NULL, NULL), _COPY(_RIGHT)),
+                            _D(_COPY(_RIGHT)));
+            case SQRT:
+                return _MUL(_DIV(create_node (NUM, 1, NULL, NULL), _MUL(create_node (NUM, 2, NULL, NULL), _COPY(node))),
+                            _D(_COPY(_RIGHT)));
+            case POW:
+                if (LTYP == NUM && RTYP != NUM)
+                    return _MUL(_MUL(_LN(NULL, _COPY(_LEFT)), _COPY(node)),
+                                _D(_COPY(_RIGHT)));
+                else if (RTYP == NUM && LTYP != NUM)
+                    return _MUL(_MUL(_COPY(_RIGHT), _POW(_COPY(_LEFT), create_node (NUM, RVAL - 1, NULL, NULL))),
+                                _D(_COPY(_LEFT)));
+                else
+                    return _MUL(_COPY(node), _D(_MUL(_COPY(_RIGHT), _LN(NULL, _COPY(_LEFT)))));
+            default:
+                printf ("Getting into default in switch!\n");
+                return NULL;
+        }
+    }
+
+    if (node->type == OPER)
+    {
+        switch ((int) node->value)
+        {
+            case ADD:
+                return _ADD(_D(_LEFT), _D(_RIGHT));
+            case SUB:
+                return _SUB(_D(_LEFT), _D(_RIGHT));
+            case MUL:
+                return _ADD(_MUL(_D(_LEFT), _COPY(_RIGHT)), _MUL(_COPY(_LEFT), _D(_RIGHT)));
+            case DIV:
+                return _DIV(_SUB(_MUL(_D(_LEFT), _COPY(_RIGHT)), _MUL(_COPY(_LEFT), _D(_RIGHT))), _MUL(_COPY(_RIGHT), _COPY(_RIGHT)));
+            default:
+                printf ("Getting into default in switch!\n");
+                return NULL;
+        }
+    }
+
+    printf ("Error!");
+    return NULL;
+}
+
+void simple (Tree* tree)
+{
+    bool is_change1 = true;
+    bool is_change2 = true;
+    while (is_change1 || is_change2)
+    {
+        is_change1 = false;
+        simple_nums (tree->root, &is_change1);
+        is_change2 = false;
+        simple_vars (tree->root, &is_change2);
     }
 }
 
-Node* simple (Node* node)
+void simple_nums (Node* node, bool* is_change)
 {
     if (!node)
-        return NULL;
+        return;
 
-    if (node->type == NUM || node->type == VAR)
-        return node;
+    if (node->type != OPER && node->type != FUNC)
+        return;
 
-    node->left = simple (node->left);
-    node->right = simple (node->right);
+    simple_nums (node->left, is_change);
+    simple_nums (node->right, is_change);
 
-    if (node->left->type == NUM && node->right->type == NUM)
+    if (node->type == OPER)
+        simple_nums_oper (node, is_change);
+    else if (node->type == FUNC)
+        simple_nums_func (node, is_change);
+}
+
+void simple_nums_oper (Node* node, bool* is_change)
+{
+    if (LTYP == NUM && RTYP == NUM)
     {
+        *is_change = true;
         node->type = NUM;
         switch ((int) node->value)
         {
             case ADD:
-                node->value = node->left->value + node->right->value;
+                node->value = LVAL + RVAL;
                 break;
             case MUL:
-                node->value = node->left->value * node->right->value;
+                node->value = LVAL * RVAL;
                 break;
             case SUB:
-                node->value = node->left->value - node->right->value;
+                node->value = LVAL - RVAL;
                 break;
             case DIV:
-                node->value = node->left->value / node->right->value;
+                node->value = LVAL / RVAL;
                 break;
             default:
                 printf ("Getting into default in switch!\n");
@@ -460,44 +628,219 @@ Node* simple (Node* node)
 
         nodes_dtor (node->left);
         nodes_dtor (node->right);
-
         node->left = NULL;
         node->right = NULL;
-        return node;
     }
+}
 
-    if ((int) node->value == MUL && (is_zero (node->left->value) || is_zero (node->right->value)))
+void simple_nums_func (Node* node, bool* is_change)
+{
+    bool tmp_change = false;
+    if (RTYP == NUM)
+    {
+        switch ((int) node->value)
+        {
+            case COS:
+                node->value = cos (RVAL);
+                tmp_change = true;
+                break;
+            case SIN:
+                node->value = sin (RVAL);
+                tmp_change = true;
+                break;
+            case LN:
+                node->value = log (RVAL);
+                tmp_change = true;
+                break;
+            case SQRT:
+                node->value = sqrt (RVAL);
+                tmp_change = true;
+                break;
+            case POW:
+                if (LTYP == NUM)
+                {
+                    node->value = pow (LVAL, RVAL);
+                    tmp_change = true;
+                }
+                break;
+            default:
+                printf ("Getting into default in switch!\n");
+                break;
+        }
+
+        if (tmp_change)
+        {
+            node->type = NUM;
+            *is_change = true;
+
+            nodes_dtor (node->left);
+            nodes_dtor (node->right);
+            node->left = NULL;
+            node->right = NULL;
+        }
+    }
+}
+
+void simple_vars (Node* node, bool* is_change)
+{
+    if (!node)
+        return;
+
+    if (node->type != OPER && node->type != FUNC)
+        return;
+
+    simple_vars (node->left, is_change);
+    simple_vars (node->right, is_change);
+
+    if (mul_zero (node) || div_zero (node))
     {
         node->type = NUM;
         node->value = 0;
+        *is_change = true;
 
         nodes_dtor (node->left);
         nodes_dtor (node->right);
 
         node->left = NULL;
         node->right = NULL;
-        return node;
+        return;
     }
 
-    if ((int) node->value == MUL &&
-        ((is_zero (node->left->value - 1) && node->left->type == NUM)
-        || (is_zero (node->right->value - 1) && node->right->type == NUM)))
+    Node* new_simple_node = NULL;
+    if (mul_one (node, &new_simple_node) || add_sub_zero (node, &new_simple_node) || div_one (node, &new_simple_node) || pow_one (node, &new_simple_node))
     {
-        node->type = VAR;
-        node->value = VAR_DEF_VAL;
+        if (new_simple_node == _RIGHT)
+            del_node (_LEFT);
+        else
+            del_node (_RIGHT);
+
+        node->type = new_simple_node->type;
+        node->value = new_simple_node->value;
+        node->right = new_simple_node->right;
+        node->left = new_simple_node->left;
+        *is_change = true;
+
+        del_node (new_simple_node);
+        return;
+    }
+
+    if (pow_zero (node) || one_pow (node))
+    {
+        node->type = NUM;
+        node->value = 1;
+        *is_change = true;
 
         nodes_dtor (node->left);
         nodes_dtor (node->right);
 
         node->left = NULL;
         node->right = NULL;
-        return node;
+        return;
     }
+}
 
-    return node;
+bool pow_zero (Node* node)
+{
+    return ((node->type == FUNC) && ((int) node->value == POW) &&
+            (RTYP == NUM) && (is_zero (RVAL)));
+}
+
+bool one_pow (Node* node)
+{
+    return ((node->type == FUNC) && ((int) node->value == POW) &&
+            (LTYP == NUM) && (is_zero (LVAL - 1)));
+}
+
+bool pow_one (Node* node, Node** new_simple_node)
+{
+    if ((node->type == FUNC) && ((int) node->value == POW))
+    {
+        if ((RTYP == NUM) && (is_zero (RVAL - 1)))
+        {
+            *new_simple_node = _LEFT;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool mul_zero (Node* node)
+{
+    return ((node->type == OPER) &&
+            ((int) node->value == MUL &&
+            ((is_zero (LVAL) && LTYP == NUM) ||
+            (is_zero (RVAL) && RTYP == NUM))));
+}
+
+bool mul_one (Node* node, Node** new_simple_node)
+{
+    if (node->type == OPER && (int) node->value == MUL)
+    {
+        if (is_zero (LVAL - 1) && LTYP == NUM)
+        {
+            *new_simple_node = _RIGHT;
+            return true;
+        }
+        else if (is_zero (RVAL - 1) && RTYP == NUM)
+        {
+            *new_simple_node = _LEFT;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool add_sub_zero (Node* node, Node** new_simple_node)
+{
+    if ((node->type == OPER) && ((int) node->value == ADD))
+    {
+        if (is_zero (LVAL) && LTYP == NUM)
+        {
+            *new_simple_node = _RIGHT;
+            return true;
+        }
+        else if (is_zero (RVAL) && RTYP == NUM)
+        {
+            *new_simple_node = _LEFT;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool div_one (Node* node, Node** new_simple_node)
+{
+    if ((node->type == OPER) && ((int) node->value == DIV))
+    {
+        if (RTYP == NUM && is_zero (RVAL - 1))
+        {
+            *new_simple_node = _LEFT;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool div_zero (Node* node)
+{
+    return ((node->type == OPER) &&
+            (((int) node->value == DIV) &&
+            (LTYP == NUM && is_zero (LVAL))));
 }
 
 bool is_zero (double x)
 {
     return (abs (x) < EPS);
+}
+
+void del_node (Node* node)
+{
+    node->left = NULL;
+    node->right = NULL;
+    free (node);
+}
+
+void print_latex (Node* node, FILE* file)
+{
+
 }
