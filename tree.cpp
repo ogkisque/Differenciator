@@ -792,7 +792,7 @@ bool mul_one (Node* node, Node** new_simple_node)
 
 bool add_sub_zero (Node* node, Node** new_simple_node)
 {
-    if ((node->type == OPER) && ((int) node->value == ADD))
+    if ((node->type == OPER) && ((int) node->value == ADD || (int) node->value == SUB))
     {
         if (is_zero (LVAL) && LTYP == NUM)
         {
@@ -976,4 +976,48 @@ void print_latex_func (Node* node, FILE* file)
     fprintf (file, "$f(x) = ");
     print_form (node, file);
     fprintf (file, "$\n\nПосчитаем производную $f^{'}(x)$\n\n");
+}
+
+void print_latex_taylor (Node* node, FILE* file)
+{
+    fprintf (file, "Выполним самую очевидную вещь в курсе математического анализа - разложение функции по формуле Тейлора: \n\n$");
+    print_form (node, file);
+    fprintf (file, "$\n\n");
+}
+
+Node* get_taylor (Tree* func, double x, size_t order)
+{
+    Tree taylor = {};
+    Tree old_diff = {};
+    Tree new_diff = {};
+    TREE_CTOR(&new_diff);
+    TREE_CTOR(&old_diff);
+    TREE_CTOR(&taylor);
+    double val = eval (func->root, x);
+    taylor.root = create_node (NUM, val, NULL, NULL);
+    old_diff.root = _COPY(func->root);
+    new_diff.root = _COPY(func->root);
+    for (size_t degree = 1; degree <= order; degree++)
+    {
+        new_diff.root = dif (old_diff.root);
+        val = eval (new_diff.root, x);
+        taylor.root = _ADD(taylor.root, _DIV(_MUL(create_node (NUM, val, NULL, NULL),
+                                                  _POW(_SUB(create_node (VAR, VAR_DEF_VAL, NULL, NULL), create_node (NUM, x, NULL, NULL)),
+                                                       create_node (NUM, (double) degree, NULL, NULL))),
+                                             create_node (NUM, factorial (degree), NULL, NULL)));
+        nodes_dtor (old_diff.root);
+        old_diff.root = _COPY(new_diff.root);
+        nodes_dtor (new_diff.root);
+    }
+    nodes_dtor (old_diff.root);
+    simple (&taylor);
+    return taylor.root;
+}
+
+double factorial (size_t x)
+{
+    size_t fact = 1;
+    for (size_t i = 1; i <= x; i++)
+        fact *= i;
+    return (double) fact;
 }

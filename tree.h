@@ -157,5 +157,8 @@ void    print_latex_end     (FILE* file);
 void    print_latex_trans   (Node* node, FILE* file);
 void    print_latex_func    (Node* node, FILE* file);
 void    generate_pdf        (const char* file_name);
+void    print_latex_taylor  (Node* node, FILE* file);
+Node*   get_taylor          (Tree* func, double x, size_t order);
+double  factorial           (size_t x);
 
 #endif //TREE_HEADER

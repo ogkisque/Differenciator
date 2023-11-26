@@ -12,13 +12,17 @@
 \maketitle
 \begin{flushleft}
 \Large
-$f(x) = ((cosx)^{sinx}+(9.000)^{x}) \cdot \sqrt{(x+2.000)}$
+$f(x) = (2.718)^{x}$
 
 Посчитаем производную $f^{'}(x)$
 
 Абсолютно тривиально, что это будет:
 
-$(((cosx)^{sinx} \cdot (cosx \cdot \ln{(cosx)}+sinx \cdot  \dfrac{1.000}{cosx}  \cdot sinx \cdot (-1.000))+2.197 \cdot (9.000)^{x}) \cdot \sqrt{(x+2.000)}+((cosx)^{sinx}+(9.000)^{x}) \cdot  \dfrac{1.000}{2.000 \cdot \sqrt{(x+2.000)}} )$
+$(2.718)^{x}$
+
+Выполним самую очевидную вещь в курсе математического анализа - разложение функции по формуле Тейлора: 
+
+$((((1.000+x)+ \dfrac{(x)^{2.000}}{2.000} )+ \dfrac{(x)^{3.000}}{6.000} )+ \dfrac{(x)^{4.000}}{24.000} )$
 
 \end{flushleft}
 \end{document}

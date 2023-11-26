@@ -45,6 +45,11 @@ int main ()
     double value1 = eval (diff.root, 1);
     printf ("x = 1: value of diff is %.3lf\n", value1);
 
+    Tree taylor = {};
+    TREE_CTOR(&taylor);
+    taylor.root = get_taylor (&tree, 0, 4);
+    print_latex_taylor (taylor.root, file_latex);
+
     print_latex_end (file_latex);
     fclose (file_latex);
     generate_pdf (LATEX_NAME);
