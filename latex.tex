@@ -2,27 +2,70 @@
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage[english,russian]{babel}
+\usepackage{pdfpages}
 \usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}
 \usepackage[left=10mm, top=10mm, right=10mm, bottom=20mm, nohead, nofoot]{geometry}
 \usepackage{wasysym}
 \author{\LARGEМерзляков Арсений}
-\title{Производная}
+\title{Анализ функции}
 \pagestyle {empty}
 \begin{document}
 \maketitle
 \begin{flushleft}
 \Large
-$f(x) = (2.718)^{x}$
+$f(x) = \sin {(x)} \cdot \cos {(2.000 \cdot x)}$
 
-Посчитаем производную $f^{'}(x)$
+Посчитаем то, что считается устно в садике - производную:
 
-Абсолютно тривиально, что это будет:
+$f(x) = x$
 
-$(2.718)^{x}$
+Даже ИНБИКСТ знает, что:
 
-Выполним самую очевидную вещь в курсе математического анализа - разложение функции по формуле Тейлора: 
+$f^{'}(x) = 1.000$
 
-$((((1.000+x)+ \dfrac{(x)^{2.000}}{2.000} )+ \dfrac{(x)^{3.000}}{6.000} )+ \dfrac{(x)^{4.000}}{24.000} )$
+$f(x) = 2.000$
 
-\end{flushleft}
+Если бы моя собака умела говорить, то сказала бы, что:
+
+$f^{'}(x) = 0.000$
+
+$f(x) = 2.000 \cdot x$
+
+Даже ИНБИКСТ знает, что:
+
+$f^{'}(x) = (0.000 \cdot x+2.000 \cdot 1.000)$
+
+$f(x) = \cos {(2.000 \cdot x)}$
+
+Сложить 2 + 2 эквивалентно по сложности следующему:
+
+$f^{'}(x) = \sin {(2.000 \cdot x)} \cdot (-1.000) \cdot (0.000 \cdot x+2.000 \cdot 1.000)$
+
+$f(x) = x$
+
+Максимально тривиально, что:
+
+$f^{'}(x) = 1.000$
+
+$f(x) = \sin {(x)}$
+
+Я сам выпал на этом моменте:
+
+$f^{'}(x) = \cos {(x)} \cdot 1.000$
+
+$f(x) = \sin {(x)} \cdot \cos {(2.000 \cdot x)}$
+
+Даже ИНБИКСТ знает, что:
+
+$f^{'}(x) = (\cos {(x)} \cdot 1.000 \cdot \cos {(2.000 \cdot x)}+\sin {(x)} \cdot \sin {(2.000 \cdot x)} \cdot (-1.000) \cdot (0.000 \cdot x+2.000 \cdot 1.000))$
+
+После очевиднейших упрощений, которые адекватный человек может сделать ещё в утробе, получаем:
+
+$(\cos {(x)} \cdot \cos {(2.000 \cdot x)}+\sin {(x)} \cdot \sin {(2.000 \cdot x)} \cdot (-1.000) \cdot 2.000)$
+
+Выполним самую тривиальную вещь в курсе математического анализа - разложение функции по формуле Тейлора: 
+
+$f(x) = (x+ \dfrac{(-13.000) \cdot (x)^{3.000}}{6.000} ) + o(x^{3}), x \rightarrow 0$
+
+\includepdf[pages=-]{graph1.pdf}\includepdf[pages=-]{graph2.pdf}\includepdf[pages=-]{graph3.pdf}\end{flushleft}
 \end{document}

@@ -1,0 +1,8 @@
+set term pdfcairo enhanced size 20cm,15cm font ',15' linewidth 3
+set output 'graph1.pdf'
+set grid xtics ytics mxtics mytics
+set xlabel 'x' font 'Sans,20'
+set ylabel 'f(x)' font 'Sans,20'
+set title 'График и касательная' font 'Sans,25'
+plot [10.000000:20.000000] ((sin(x))*(cos((2.000)*(x)))), ((0.100)+((1.168)*((x)-(15.000))))
+set term pop

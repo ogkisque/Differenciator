@@ -2,7 +2,27 @@
 
 #include "Dotter.h"
 
-const char*     NAME_DOT        = "pic.dot";
+const char* NAME_DOT    = "pic.dot";
+const int   NUM_PHRASES = 18;
+const char* PHRASES[]   = { "Максимально тривиально, что:",
+                            "Если спросить у рандомного бомжа на улице, то он будет знать, что:",
+                            "Заметим, что:",
+                            "Не понимаю тех, кто не знает, что:",
+                            "Я сам выпал на этом моменте:",
+                            "Если приглядеться, то ты все равно не увидишь, что:",
+                            "В садике мне рассказывали, что:",
+                            "Если бы меня разбудили в ночь после посвята, то я бы сходу ответил, что:",
+                            "Даже ИНБИКСТ знает, что:",
+                            "Если бы моя собака умела говорить, то сказала бы, что:",
+                            "Петрович закопает того, кто не знает, что:",
+                            "Ежу понятно, что:",
+                            "Ллойд и Гарри из 'Тупой и ещё тупее' знали, что:",
+                            "Невооруженным взглядом видно, что:",
+                            "Сложить 2 + 2 эквивалентно по сложности следующему:",
+                            "Ньютон перевернулся бы в гробу, если бы узнал, что ты не знаешь, что:",
+                            "Я бы перерезал себе вены, если бы не знал, что:",
+                            "Сколько бы я не терял память, никогда не забуду, что:"
+                          };
 
 Error new_node (Types type, double value, Node** adres)
 {
@@ -159,6 +179,18 @@ void val_to_str (const Node* node, char* str)
             case LN:
                 sprintf (str, "ln ");
                 return;
+            case TG:
+                sprintf (str, "tg ");
+                return;
+            case ARCSIN:
+                sprintf (str, "arcsin ");
+                return;
+            case ARCCOS:
+                sprintf (str, "arccos ");
+                return;
+            case ARCTG:
+                sprintf (str, "arctg ");
+                return;
             default:
                 printf ("Unknown function!\n");
                 return;
@@ -255,6 +287,30 @@ bool read_func (ReadStr* str, Node** node)
         is_func = true;
         (*node)->left = NULL;
         (*node)->value = LN;
+    }
+    else if (strcmp (text, "tg") == 0)
+    {
+        is_func = true;
+        (*node)->left = NULL;
+        (*node)->value = TG;
+    }
+    else if (strcmp (text, "arcsin") == 0)
+    {
+        is_func = true;
+        (*node)->left = NULL;
+        (*node)->value = ARCSIN;
+    }
+    else if (strcmp (text, "arccos") == 0)
+    {
+        is_func = true;
+        (*node)->left = NULL;
+        (*node)->value = ARCCOS;
+    }
+    else if (strcmp (text, "arctg") == 0)
+    {
+        is_func = true;
+        (*node)->left = NULL;
+        (*node)->value = ARCTG;
     }
 
     if (is_func)
@@ -365,12 +421,16 @@ double eval (const Node* node, double x)
     {
         switch ((int) node->value)
         {
-            case COS:  return cos   (right_val);
-            case SIN:  return sin   (right_val);
-            case POW:  return pow   (left_val, right_val);
-            case SQRT: return sqrt  (right_val);
-            case LN:   return log   (right_val);
-            default:   return       0;
+            case COS:       return cos      (right_val);
+            case SIN:       return sin      (right_val);
+            case POW:       return pow      (left_val, right_val);
+            case SQRT:      return sqrt     (right_val);
+            case LN:        return log      (right_val);
+            case TG:        return tan      (right_val);
+            case ARCTG:     return atan     (right_val);
+            case ARCSIN:    return asin     (right_val);
+            case ARCCOS:    return acos     (right_val);
+            default:        return          0;
         }
     }
     printf ("Error!");
@@ -507,42 +567,93 @@ Node* copy_node (const Node* old_node)
     return node;
 }
 
-Node* dif (const Node* node)
+Node* dif (const Node* node, FILE* file, bool need_latex)
 {
     if (!node)
         return NULL;
 
+    Node* tmp = NULL;
+
     if (node->type == NUM)
-        return create_node (NUM, 0, NULL, NULL);
+    {
+        tmp = create_node (NUM, 0, NULL, NULL);
+        if (need_latex)
+        {
+            print_latex_func (node, file);
+            print_latex_phrase (file);
+            print_latex_trans (tmp, file);
+        }
+        return tmp;
+    }
 
     if (node->type == VAR)
-        return create_node (NUM, 1, NULL, NULL);
+    {
+        tmp = create_node (NUM, 1, NULL, NULL);
+        if (need_latex)
+        {
+            print_latex_func (node, file);
+            print_latex_phrase (file);
+            print_latex_trans (tmp, file);
+        }
+        return tmp;
+    }
 
     if (node->type == FUNC)
     {
         switch ((int) node->value)
         {
             case COS:
-                return _MUL(_MUL(_SIN(NULL, _COPY(_RIGHT)), create_node (NUM, -1, NULL, NULL)),
-                            _D(_COPY(_RIGHT)));
+                tmp = _MUL(_MUL(_SIN(NULL, _COPY(_RIGHT)), create_node (NUM, -1, NULL, NULL)),
+                            _D(_RIGHT, need_latex));
+                break;
             case SIN:
-                return _MUL(_COS(NULL, _COPY(_RIGHT)),
-                            _D(_COPY(_RIGHT)));
+                tmp = _MUL(_COS(NULL, _COPY(_RIGHT)),
+                            _D(_RIGHT, need_latex));
+                break;
             case LN:
-                return _MUL(_DIV(create_node (NUM, 1, NULL, NULL), _COPY(_RIGHT)),
-                            _D(_COPY(_RIGHT)));
+                tmp = _MUL(_DIV(create_node (NUM, 1, NULL, NULL), _COPY(_RIGHT)),
+                            _D(_RIGHT, need_latex));
+                break;
             case SQRT:
-                return _MUL(_DIV(create_node (NUM, 1, NULL, NULL), _MUL(create_node (NUM, 2, NULL, NULL), _COPY(node))),
-                            _D(_COPY(_RIGHT)));
+                tmp = _MUL(_DIV(create_node (NUM, 1, NULL, NULL), _MUL(create_node (NUM, 2, NULL, NULL), _COPY(node))),
+                            _D(_RIGHT, need_latex));
+                break;
             case POW:
                 if (LTYP == NUM && RTYP != NUM)
-                    return _MUL(_MUL(_LN(NULL, _COPY(_LEFT)), _COPY(node)),
-                                _D(_COPY(_RIGHT)));
+                    tmp = _MUL(_MUL(_LN(NULL, _COPY(_LEFT)), _COPY(node)),
+                                _D(_RIGHT, need_latex));
                 else if (RTYP == NUM && LTYP != NUM)
-                    return _MUL(_MUL(_COPY(_RIGHT), _POW(_COPY(_LEFT), create_node (NUM, RVAL - 1, NULL, NULL))),
-                                _D(_COPY(_LEFT)));
+                    tmp = _MUL(_MUL(_COPY(_RIGHT), _POW(_COPY(_LEFT), create_node (NUM, RVAL - 1, NULL, NULL))),
+                                _D(_LEFT, need_latex));
                 else
-                    return _MUL(_COPY(node), _D(_MUL(_COPY(_RIGHT), _LN(NULL, _COPY(_LEFT)))));
+                    tmp = _MUL(_COPY(node), _D(_MUL(_COPY(_RIGHT), _LN(NULL, _COPY(_LEFT))), need_latex));
+                break;
+            case TG:
+                tmp = _MUL(_DIV(create_node (NUM, 1, NULL, NULL), _MUL(_COS(NULL, _COPY(_RIGHT)), _COS(NULL, _COPY(_RIGHT)))),
+                            _D(_RIGHT, need_latex));
+                break;
+            case ARCSIN:
+                tmp = _MUL(_DIV(create_node (NUM, 1, NULL, NULL),
+                                 _SQRT(NULL, _SUB(create_node (NUM, 1, NULL, NULL),
+                                                  _MUL(_COPY(_RIGHT),
+                                                       _COPY(_RIGHT))))),
+                            _D(_RIGHT, need_latex));
+                break;
+            case ARCTG:
+                tmp = _MUL(_DIV(create_node (NUM, 1, NULL, NULL),
+                                 _ADD(create_node (NUM, 1, NULL, NULL),
+                                      _MUL(_COPY(_RIGHT),
+                                           _COPY(_RIGHT)))),
+                            _D(_RIGHT, need_latex));
+                break;
+            case ARCCOS:
+                tmp = _MUL(_MUL(create_node (NUM, -1, NULL, NULL),
+                                 _DIV(create_node (NUM, 1, NULL, NULL),
+                                      _SQRT(NULL, _SUB(create_node (NUM, 1, NULL, NULL),
+                                                       _MUL(_COPY(_RIGHT),
+                                                            _COPY(_RIGHT)))))),
+                            _D(_RIGHT, need_latex));
+                break;
             default:
                 printf ("Getting into default in switch!\n");
                 return NULL;
@@ -554,21 +665,31 @@ Node* dif (const Node* node)
         switch ((int) node->value)
         {
             case ADD:
-                return _ADD(_D(_LEFT), _D(_RIGHT));
+                tmp = _ADD(_D(_LEFT, need_latex), _D(_RIGHT, need_latex));
+                break;
             case SUB:
-                return _SUB(_D(_LEFT), _D(_RIGHT));
+                tmp = _SUB(_D(_LEFT, need_latex), _D(_RIGHT, need_latex));
+                break;
             case MUL:
-                return _ADD(_MUL(_D(_LEFT), _COPY(_RIGHT)), _MUL(_COPY(_LEFT), _D(_RIGHT)));
+                tmp = _ADD(_MUL(_D(_LEFT, need_latex), _COPY(_RIGHT)), _MUL(_COPY(_LEFT), _D(_RIGHT, need_latex)));
+                break;
             case DIV:
-                return _DIV(_SUB(_MUL(_D(_LEFT), _COPY(_RIGHT)), _MUL(_COPY(_LEFT), _D(_RIGHT))), _MUL(_COPY(_RIGHT), _COPY(_RIGHT)));
+                tmp = _DIV(_SUB(_MUL(_D(_LEFT, need_latex), _COPY(_RIGHT)), _MUL(_COPY(_LEFT), _D(_RIGHT, need_latex))), _MUL(_COPY(_RIGHT), _COPY(_RIGHT)));
+                break;
             default:
                 printf ("Getting into default in switch!\n");
                 return NULL;
         }
     }
 
-    printf ("Error!");
-    return NULL;
+    if (need_latex)
+    {
+        print_latex_func (node, file);
+        print_latex_phrase (file);
+        print_latex_trans (tmp, file);
+    }
+
+    return tmp;
 }
 
 void simple (Tree* tree)
@@ -662,6 +783,22 @@ void simple_nums_func (Node* node, bool* is_change)
                     node->value = pow (LVAL, RVAL);
                     tmp_change = true;
                 }
+                break;
+            case TG:
+                node->value = tan (RVAL);
+                tmp_change = true;
+                break;
+            case ARCSIN:
+                node->value = asin (RVAL);
+                tmp_change = true;
+                break;
+            case ARCCOS:
+                node->value = acos (RVAL);
+                tmp_change = true;
+                break;
+            case ARCTG:
+                node->value = atan (RVAL);
+                tmp_change = true;
                 break;
             default:
                 printf ("Getting into default in switch!\n");
@@ -847,11 +984,12 @@ void print_latex_begin (FILE* file)
     "\\usepackage[T1]{fontenc}\n"
     "\\usepackage[utf8]{inputenc}\n"
     "\\usepackage[english,russian]{babel}\n"
+    "\\usepackage{pdfpages}\n"
     "\\usepackage{amsmath,amsfonts,amssymb,amsthm,mathtools}\n"
     "\\usepackage[left=10mm, top=10mm, right=10mm, bottom=20mm, nohead, nofoot]{geometry}\n"
     "\\usepackage{wasysym}\n"
     "\\author{\\LARGEМерзляков Арсений}\n"
-    "\\title{Производная}\n"
+    "\\title{Анализ функции}\n"
     "\\pagestyle {empty}\n"
     "\\begin{document}\n"
     "\\maketitle\n"
@@ -866,14 +1004,14 @@ void print_latex_end (FILE* file)
     "\\end{document}");
 }
 
-void print_latex_trans (Node* node, FILE* file)
+void print_latex_trans (const Node* node, FILE* file)
 {
-    fprintf (file, "Абсолютно тривиально, что это будет:\n\n$");
+    fprintf (file, "$f^{'}(x) = ");
     print_form (node, file);
     fprintf (file, "$\n\n");
 }
 
-void print_form (Node* node, FILE* file)
+void print_form (const Node* node, FILE* file)
 {
     if (!node)
         return;
@@ -933,20 +1071,42 @@ void print_form (Node* node, FILE* file)
         switch ((int) node->value)
         {
             case COS:
-                fprintf (file, "cos");
+                fprintf (file, "\\cos {(");
                 print_form (node->right, file);
+                fprintf (file, ")}");
                 break;
             case SIN:
-                fprintf (file, "sin");
+                fprintf (file, "\\sin {(");
                 print_form (node->right, file);
+                fprintf (file, ")}");
+                break;
+            case ARCSIN:
+                fprintf (file, "\\arcsin {(");
+                print_form (node->right, file);
+                fprintf (file, ")}");
+                break;
+            case ARCCOS:
+                fprintf (file, "\\arccos {(");
+                print_form (node->right, file);
+                fprintf (file, ")}");
+                break;
+            case TG:
+                fprintf (file, "\\tan {(");
+                print_form (node->right, file);
+                fprintf (file, ")}");
+                break;
+            case ARCTG:
+                fprintf (file, "\\arctan {(");
+                print_form (node->right, file);
+                fprintf (file, ")}");
                 break;
             case LN:
-                fprintf (file, "\\ln{(");
+                fprintf (file, "\\ln {(");
                 print_form (node->right, file);
                 fprintf (file, ")}");
                 break;
             case SQRT:
-                fprintf (file, "\\sqrt{");
+                fprintf (file, "\\sqrt {");
                 print_form (node->right, file);
                 fprintf (file, "}");
                 break;
@@ -971,21 +1131,24 @@ void generate_pdf (const char* file_name)
     system (text);
 }
 
-void print_latex_func (Node* node, FILE* file)
+void print_latex_func (const Node* node, FILE* file)
 {
     fprintf (file, "$f(x) = ");
-    print_form (node, file);
-    fprintf (file, "$\n\nПосчитаем производную $f^{'}(x)$\n\n");
-}
-
-void print_latex_taylor (Node* node, FILE* file)
-{
-    fprintf (file, "Выполним самую очевидную вещь в курсе математического анализа - разложение функции по формуле Тейлора: \n\n$");
     print_form (node, file);
     fprintf (file, "$\n\n");
 }
 
-Node* get_taylor (Tree* func, double x, size_t order)
+void print_latex_taylor (Node* node, FILE* file, double x, size_t order)
+{
+    fprintf (file, "Выполним самую тривиальную вещь в курсе математического анализа - разложение функции по формуле Тейлора: \n\n$f(x) = ");
+    print_form (node, file);
+    if (!is_zero (x))
+        fprintf (file, " + o((x - %.3lf)^{%llu}), x \\rightarrow %.3lf$\n\n", x, order, x);
+    else
+        fprintf (file, " + o(x^{%llu}), x \\rightarrow 0$\n\n", order);
+}
+
+Node* get_taylor (Tree* func, double x, size_t order, FILE* file)
 {
     Tree taylor = {};
     Tree old_diff = {};
@@ -999,7 +1162,7 @@ Node* get_taylor (Tree* func, double x, size_t order)
     new_diff.root = _COPY(func->root);
     for (size_t degree = 1; degree <= order; degree++)
     {
-        new_diff.root = dif (old_diff.root);
+        new_diff.root = dif (old_diff.root, file, false);
         val = eval (new_diff.root, x);
         taylor.root = _ADD(taylor.root, _DIV(_MUL(create_node (NUM, val, NULL, NULL),
                                                   _POW(_SUB(create_node (VAR, VAR_DEF_VAL, NULL, NULL), create_node (NUM, x, NULL, NULL)),
@@ -1020,4 +1183,193 @@ double factorial (size_t x)
     for (size_t i = 1; i <= x; i++)
         fact *= i;
     return (double) fact;
+}
+
+void get_graph_script (Node* node, double x, double delta, const char* name_graph, const char* name_script, const char* name_pdf)
+{
+    FILE* file = fopen (name_script, "w");
+    fprintf (file,
+            "set term pdfcairo enhanced size 20cm,15cm font ',15' linewidth 3\n"
+            "set output '%s'\n"
+            "set grid xtics ytics mxtics mytics\n"
+            "set xlabel 'x' font 'Sans,20'\n"
+            "set ylabel 'f(x)' font 'Sans,20'\n"
+            "set title '%s' font 'Sans,25'\n", name_pdf, name_graph);
+    fprintf (file, "plot [%lf:%lf] ", x - delta, x + delta);
+    print_nodes_graph (file, node);
+    fprintf (file, "\nset term pop\n");
+    fclose (file);
+}
+
+void get_graph_pdf (Node* node, double x, double delta, const char* name_graph, const char* name_script, const char* name_pdf)
+{
+    get_graph_script (node, x, delta, name_graph, name_script, name_pdf);
+    char text[MAX_TEXT_SIZE] = "";
+    sprintf (text, "gnuplot -c %s", name_script);
+    system (text);
+}
+
+void print_nodes_graph (FILE* file, Node* node)
+{
+    if (!node)
+        return;
+
+    fprintf (file, "(");
+    print_nodes_graph (file, node->left);
+
+    char str[MAX_STR_SIZE] = "";
+    val_to_str_graph (node, str);
+
+    fprintf (file, "%s", str);
+
+    print_nodes_graph (file, node->right);
+    fprintf (file, ")");
+}
+
+void val_to_str_graph (const Node* node, char* str)
+{
+    if (node->type == NUM)
+    {
+        sprintf (str, "%.3lf", node->value);
+        return;
+    }
+
+    if (node->type == VAR)
+    {
+        sprintf (str, "x");
+        return;
+    }
+
+    if (node->type == FUNC)
+    {
+        switch ((int) node->value)
+        {
+            case COS:
+                sprintf (str, "cos");
+                return;
+            case SIN:
+                sprintf (str, "sin");
+                return;
+            case SQRT:
+                sprintf (str, "sqrt");
+                return;
+            case POW:
+                sprintf (str, "**");
+                return;
+            case LN:
+                sprintf (str, "log");
+                return;
+            case TG:
+                sprintf (str, "tan");
+                return;
+            case ARCSIN:
+                sprintf (str, "asin");
+                return;
+            case ARCCOS:
+                sprintf (str, "acos");
+                return;
+            case ARCTG:
+                sprintf (str, "atan");
+                return;
+            default:
+                printf ("Unknown function!\n");
+                return;
+        }
+    }
+
+    if (node->type == OPER)
+    {
+        switch ((int) node->value)
+        {
+            case ADD:
+                sprintf (str, "+");
+                return;
+            case MUL:
+                sprintf (str, "*");
+                return;
+            case SUB:
+                sprintf (str, "-");
+                return;
+            case DIV:
+                sprintf (str, "/");
+                return;
+            default:
+                return;
+        }
+    }
+}
+
+void get_two_graph_script (Node* node1, Node* node2, double x, double delta, const char* name_graph, const char* name_script, const char* name_pdf)
+{
+    FILE* file = fopen (name_script, "w");
+    fprintf (file,
+            "set term pdfcairo enhanced size 20cm,15cm font ',15' linewidth 3\n"
+            "set output '%s'\n"
+            "set grid xtics ytics mxtics mytics\n"
+            "set xlabel 'x' font 'Sans,20'\n"
+            "set ylabel 'f(x)' font 'Sans,20'\n"
+            "set title '%s' font 'Sans,25'\n", name_pdf, name_graph);
+    fprintf (file, "plot [%lf:%lf] ", x - delta, x + delta);
+    print_nodes_graph (file, node1);
+    fprintf (file, ", ");
+    print_nodes_graph (file, node2);
+    fprintf (file, "\nset term pop\n");
+    fclose (file);
+}
+
+void get_two_graph_pdf (Node* node1, Node* node2, double x, double delta, const char* name_graph, const char* name_script, const char* name_pdf)
+{
+    get_two_graph_script (node1, node2, x, delta, name_graph, name_script, name_pdf);
+    char text[MAX_TEXT_SIZE] = "";
+    sprintf (text, "gnuplot -c %s", name_script);
+    system (text);
+}
+
+Node* get_difference (Tree* tree1, Tree* tree2)
+{
+    return _SUB(_COPY(tree1->root), _COPY(tree2->root));
+}
+
+double get_delta (const Node* node, double x)
+{
+    double x_max = x;
+    while (abs (eval (node, x_max)) < DELTA)
+        x_max += DELTA_STEP;
+    return (x_max - x);
+}
+
+Node* get_tangent (const Node* func, const Node* diff, double x)
+{
+    return _ADD(create_node (NUM, eval (func, x), NULL, NULL),
+                _MUL(create_node (NUM, eval (diff, x), NULL, NULL),
+                     _SUB(create_node (VAR, VAR_DEF_VAL, NULL, NULL),
+                          create_node (NUM, x, NULL, NULL))));
+}
+
+void print_latex_graph (FILE* file, const char* file_name)
+{
+    fprintf (file, "\\includepdf[pages=-]{%s}", file_name);
+}
+
+void print_latex_simple (Node* node, FILE* file)
+{
+    fprintf (file, "После очевиднейших упрощений, которые адекватный человек может сделать ещё в утробе, получаем:\n\n$");
+    print_form (node, file);
+    fprintf (file, "$\n\n");
+}
+
+void print_latex_phrase (FILE* file)
+{
+    int random = rand () % NUM_PHRASES;
+    fprintf (file, "%s\n\n", PHRASES[random]);
+}
+
+void get_points_taylor_tangent (double* x_taylor, double* x_tangent, size_t* order)
+{
+    printf ("# Enter the decomposition point:\n");
+    scanf ("%lf", x_taylor);
+    printf ("# Enter the decomposition order:\n");
+    scanf ("%llu", order);
+    printf ("# Enter the point where you want to draw the tangent:\n");
+    scanf ("%lf", x_tangent);
 }

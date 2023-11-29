@@ -1,0 +1,8 @@
+set term pdfcairo enhanced size 20cm,15cm font ',15' linewidth 3
+set output 'graph3.pdf'
+set grid xtics ytics mxtics mytics
+set xlabel 'x' font 'Sans,20'
+set ylabel 'f(x)' font 'Sans,20'
+set title 'Разность функции и её разложения' font 'Sans,25'
+plot [-0.900000:0.900000] (((sin(x))*(cos((2.000)*(x))))-((x)+(((-13.000)*((x)**(3.000)))/(6.000))))
+set term pop
