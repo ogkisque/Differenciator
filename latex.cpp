@@ -48,9 +48,9 @@ void print_latex_end (FILE* file)
     "\\end{document}");
 }
 
-void print_latex_trans (const Node* node, FILE* file)
+void print_latex_trans (const Node* node, FILE* file, const char* var_name)
 {
-    fprintf (file, "$f^{'}(x) = ");
+    fprintf (file, "$f^{'}(%s) = ", var_name);
     print_form (node, file);
     fprintf (file, "$\n\n");
 }
@@ -71,7 +71,7 @@ void print_form (const Node* node, FILE* file)
 
     if (node->type == VAR)
     {
-        fprintf (file, "x");
+        fprintf (file, "%s", node->name);
         return;
     }
 
@@ -175,21 +175,35 @@ void generate_pdf (const char* file_name)
     system (text);
 }
 
-void print_latex_func (const Node* node, FILE* file)
+void print_latex_func_vars (const Node* node, FILE* file, Vars* vars)
 {
-    fprintf (file, "$f(x) = ");
+    fprintf (file, "$f(");
+    for (int i = 0; i < vars->num_vars; i++)
+    {
+        fprintf (file, "%s", vars->vars[i].name);
+        if (i != vars->num_vars - 1)
+            fprintf (file, ", ");
+    }
+    fprintf (file, ") = ");
     print_form (node, file);
     fprintf (file, "$\n\n");
 }
 
-void print_latex_taylor (Node* node, FILE* file, double x, size_t order)
+void print_latex_func (const Node* node, FILE* file, const char* var_name)
+{
+    fprintf (file, "$f(%s) = ", var_name);
+    print_form (node, file);
+    fprintf (file, "$\n\n");
+}
+
+void print_latex_taylor (Node* node, FILE* file, double x, const char* name, size_t order)
 {
     fprintf (file, "Выполним самую тривиальную вещь в курсе математического анализа - разложение функции по формуле Тейлора: \n\n$f(x) = ");
     print_form (node, file);
     if (!is_zero (x))
-        fprintf (file, " + o((x - %.3lf)^{%llu}), x \\rightarrow %.3lf$\n\n", x, order, x);
+        fprintf (file, " + o((%s - %.3lf)^{%llu}), %s \\rightarrow %.3lf$\n\n", name, x, order, name, x);
     else
-        fprintf (file, " + o(x^{%llu}), x \\rightarrow 0$\n\n", order);
+        fprintf (file, " + o(%s^{%llu}), %s \\rightarrow 0$\n\n", name, order, name);
 }
 
 void print_latex_graph (FILE* file, const char* file_name)
@@ -208,4 +222,26 @@ void print_latex_phrase (FILE* file)
 {
     int random = rand () % NUM_PHRASES;
     fprintf (file, "%s\n\n", PHRASES[random]);
+}
+
+void print_latex_full_dif (Tree diffs[], Vars* vars, FILE* file_latex)
+{
+    fprintf (file_latex, "Тогда полный дифференциал будет:\n\n$df = ");
+
+    for (int i = 0; i < vars->num_vars; i++)
+    {
+        fprintf (file_latex, "\\dfrac{\\partial f}{\\partial %s} \\cdot d%s", vars->vars[i].name, vars->vars[i].name);
+        if (i != vars->num_vars - 1)
+            fprintf (file_latex, " + ");
+    }
+    fprintf (file_latex, " = ");
+
+    for (int i = 0; i < vars->num_vars; i++)
+    {
+        print_form (diffs[i].root, file_latex);
+        fprintf (file_latex, " \\cdot d%s", vars->vars[i].name);
+        if (i != vars->num_vars - 1)
+            fprintf (file_latex, " + ");
+    }
+    fprintf (file_latex, "$\n\n");
 }

@@ -13,18 +13,43 @@
             return error.code;                  \
         }
 
-const char*     LATEX_NAME              = "latex.tex";
+const char*     LATEX_NAME              = "latex/latex.tex";
 const char*     INPUT_NAME              = "input.txt";
 const char*     OUTPUT_NAME             = "output.txt";
-const char*     NAME_1GRAPH_PDF         = "graph1.pdf";
-const char*     NAME_1GRAPH_SCRIPT      = "script1.txt";
-const char*     NAME_2GRAPH_PDF         = "graph2.pdf";
-const char*     NAME_2GRAPH_SCRIPT      = "script2.txt";
-const char*     NAME_3GRAPH_PDF         = "graph3.pdf";
-const char*     NAME_3GRAPH_SCRIPT      = "script3.txt";
 
 int main ()
 {
+    FILE* file_latex = fopen (LATEX_NAME, "w");
+    print_latex_begin (file_latex);
+
+    Vars vars = {};
+    Tree func = {};
+    ReadStr str = {};
+    Error error = {};
+    TREE_CTOR(&func);
+
+    FILE* file = fopen (INPUT_NAME, "r");
+    read_file (file, &str);
+    fclose (file);
+    error = nodes_read (&func, &(func.root), &str, &vars);
+    simple (&func);
+
+    print_latex_func_vars (func.root, file_latex, &vars);
+
+    if (vars.num_vars == 1)
+        exec_one_var (&func, file_latex, vars.vars[0].name);
+    else
+        exec_vars (&func, file_latex, &vars);
+
+    print_latex_end (file_latex);
+    fclose (file_latex);
+    generate_pdf (LATEX_NAME);
+
+    tree_dtor (&func);
+    vars_dtor (&vars);
+
+    fclose (file_latex);
+/*
     double x_taylor = 0.0;
     double x_tangent = 0.0;
     size_t order = 0;
@@ -42,10 +67,6 @@ int main ()
     read_file (file, &str);
     fclose (file);
     error = nodes_read (&func, &(func.root), &str);
-
-    FILE* file1 = fopen (OUTPUT_NAME, "w");
-    error = nodes_print (func.root, file1),
-    fclose (file1);
 
     simple (&func);
     print_latex_func (func.root, file_latex);
@@ -91,5 +112,6 @@ int main ()
     tree_dtor (&func);
     tree_dtor (&taylor);
     tree_dtor (&diff_func_taylor);
+*/
     return 0;
 }

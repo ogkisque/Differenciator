@@ -1,8 +1,8 @@
 set term pdfcairo enhanced size 20cm,15cm font ',15' linewidth 3
-set output 'graph2.pdf'
+set output 'latex/graph2.pdf'
 set grid xtics ytics mxtics mytics
 set xlabel 'x' font 'Sans,20'
 set ylabel 'f(x)' font 'Sans,20'
 set title 'Сравнение графиков функции и её разложения' font 'Sans,25'
-plot [-1.200000:1.200000] ((sin(x))*(cos((2.000)*(x)))), (((x)+(((-13.000)*((x)**(3.000)))/(6.000)))+(((121.000)*((x)**(5.000)))/(120.000)))
+plot [-2.600000:2.600000] (((2.718)**(x))+(sin(x))), (((((1.000)+((2.000)*(x)))+(((x)**(2.000))/(2.000)))+(((x)**(4.000))/(24.000)))+(((1.999)*((x)**(5.000)))/(120.000)))
 set term pop

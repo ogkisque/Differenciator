@@ -1,6 +1,6 @@
 #include "tree.h"
 
-Error new_node (Types type, double value, Node** adres)
+Error new_node (Types type, double value, char* name, Node** adres)
 {
     if (!adres)
         RETURN_ERROR(NULL_POINTER, "Null pointer of pointer of adress.");
@@ -10,16 +10,22 @@ Error new_node (Types type, double value, Node** adres)
     if (!(*adres))
         RETURN_ERROR(MEM_ALLOC, "Error of allocation memory of node.");
 
-    Error error = node_ctor (type, value, *adres);
+    Error error = node_ctor (type, value, name, *adres);
     return error;
 }
 
-Error node_ctor (Types type, double value, Node* node)
+Error node_ctor (Types type, double value, char* name, Node* node)
 {
     node->left  = NULL;
     node->right = NULL;
     node->type  = type;
     node->value = value;
+    if (name)
+    {
+        node->name  = strdup (name);
+        if (!node->name)
+            RETURN_ERROR(MEM_ALLOC, "Error of allocation memory for name of var");
+    }
     RETURN_ERROR(CORRECT, "");
 }
 
@@ -60,6 +66,11 @@ void nodes_dtor (Node* node)
         nodes_dtor (node->left);
     if (node->right)
         nodes_dtor (node->right);
+    if (node->name)
+    {
+        free (node->name);
+        node->name = NULL;
+    }
     node->value = 0;
     free (node);
     node = NULL;
@@ -106,7 +117,7 @@ void val_to_str (const Node* node, char* str)
 
     if (node->type == VAR)
     {
-        sprintf (str, "x");
+        sprintf (str, "%s", node->name);
         return;
     }
 
@@ -169,7 +180,7 @@ void val_to_str (const Node* node, char* str)
     }
 }
 
-Error nodes_read (Tree* tree, Node** node, ReadStr* str)
+Error nodes_read (Tree* tree, Node** node, ReadStr* str, Vars* vars)
 {
     if (!str)
         RETURN_ERROR(NULL_POINTER, "Null pointer of str.");
@@ -184,23 +195,23 @@ Error nodes_read (Tree* tree, Node** node, ReadStr* str)
 
     tree->size++;
     str->pos += 2;
-    Error error = new_node (NUM, 0, node);
+    Error error = new_node (NUM, 0, NULL, node);
 
-    nodes_read (tree, &((*node)->left), str);
+    nodes_read (tree, &((*node)->left), str, vars);
 
-    read_value (str, node);
+    error = read_value (str, node, vars);
 
-    nodes_read (tree, &((*node)->right), str);
+    nodes_read (tree, &((*node)->right), str, vars);
     str->pos += 2;
     return error;
 }
 
-void read_value (ReadStr* str, Node** node)
+Error read_value (ReadStr* str, Node** node, Vars* vars)
 {
-    if (read_num  (str, node)) return;
-    if (read_var  (str, node)) return;
-    if (read_oper (str, node)) return;
-    if (read_func (str, node)) return;
+    if (read_num  (str, node)) RETURN_ERROR(CORRECT, "");
+    if (read_oper (str, node)) RETURN_ERROR(CORRECT, "");
+    if (read_func (str, node)) RETURN_ERROR(CORRECT, "");
+    return read_var (str, node, vars);
 }
 
 bool read_func (ReadStr* str, Node** node)
@@ -306,18 +317,48 @@ bool read_oper (ReadStr* str, Node** node)
     return is_oper;
 }
 
-bool read_var (ReadStr* str, Node** node)
+Error read_var (ReadStr* str, Node** node, Vars* vars)
 {
     char text[MAX_SIZE] = "";
-    sscanf (str->str + str->pos, "%s", text);
-    if (strcmp (text, "x") == 0)
-    {
-        (*node)->type = VAR;
-        (*node)->value = VAR_DEF_VAL;
-        str->pos += 2;
-        return true;
-    }
+    int num_read = 0;
+    sscanf (str->str + str->pos, "%s%n", text, &num_read);
+
+    if  (strcmp (text, ")") == 0 || strcmp (text, "(") == 0)
+        RETURN_ERROR(CORRECT, "");
+
+    str->pos += num_read + 1;
+    (*node)->type  = VAR;
+    (*node)->value = VAR_DEF_VAL;
+    (*node)->name  = strdup (text);
+    if (!((*node)->name))
+        RETURN_ERROR(MEM_ALLOC, "Error of allocation memory for name of var");
+
+    if (!found_var (vars, text))
+        return append_var (vars, text);
+    RETURN_ERROR(CORRECT, "");
+}
+
+bool found_var (Vars* vars, char* name)
+{
+    for (int i = 0; i < vars->num_vars; i++)
+        if (strcmp (name, vars->vars[i].name) == 0)
+            return true;
+
     return false;
+}
+
+Error append_var (Vars* vars, char* name)
+{
+    if (vars->num_vars == MAX_NUM_VARS)
+        RETURN_ERROR(VARS_OVERFLOW, "Number of variables is more than max number of variables");
+
+    vars->vars[vars->num_vars].value = VAR_DEF_VAL;
+    vars->vars[vars->num_vars].name = strdup (name);
+    if (!(vars->vars[vars->num_vars].name))
+        RETURN_ERROR(MEM_ALLOC, "Error of allocation memory for name of var");
+
+    vars->num_vars++;
+    RETURN_ERROR(CORRECT, "");
 }
 
 bool read_num (ReadStr* str, Node** node)
@@ -379,4 +420,19 @@ int comparator (const void* p1, const void* p2)
 bool is_zero (double x)
 {
     return (abs (x) < EPS);
+}
+
+Error vars_dtor (Vars* vars)
+{
+    if (!vars)
+        RETURN_ERROR(NULL_POINTER, "NUll pointer of struct variables");
+
+    for (int i = 0; i < vars->num_vars; i++)
+    {
+        free (vars->vars[i].name);
+        vars->vars[i].name = NULL;
+        vars->vars[i].value = 0;
+    }
+    vars->num_vars = -1;
+    RETURN_ERROR(CORRECT, "");
 }

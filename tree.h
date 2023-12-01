@@ -40,6 +40,7 @@ const int       MAX_TEXT_SIZE   = 200;
 const int       MAX_SIZE        = 100;
 const int       VAR_DEF_VAL     = 2;
 const double    EPS             = 1e-3;
+const int       MAX_NUM_VARS    = 10;
 
 enum Types
 {
@@ -70,10 +71,23 @@ enum Funcs
     ARCTG   = 9
 };
 
+struct Var
+{
+    char*   name;
+    double  value;
+};
+
+struct Vars
+{
+    Var vars[MAX_NUM_VARS];
+    int num_vars;
+};
+
 struct Node
 {
     Types   type;
     double  value;
+    char*   name;
     Node*   left;
     Node*   right;
 };
@@ -101,10 +115,10 @@ Error   tree_dtor                   (Tree* tree);
 Error   read_file                   (FILE* file, ReadStr* str);
 Error   nodes_print                 (const Node* node, FILE* file);
 void    val_to_str                  (const Node* node, char* str);
-Error   nodes_read                  (Tree* tree, Node** node, ReadStr* str);
-void    read_value                  (ReadStr* str, Node** node);
-Error   new_node                    (Types type, double value, Node** adres);
-Error   node_ctor                   (Types type, double value, Node* node);
+Error   nodes_read                  (Tree* tree, Node** node, ReadStr* str, Vars* vars);
+Error   read_value                  (ReadStr* str, Node** node, Vars* vars);
+Error   new_node                    (Types type, double value, char* name, Node** adres);
+Error   node_ctor                   (Types type, double value, char* name, Node* node);
 void    nodes_dtor                  (Node* node);
 Error   tree_verify                 (const Tree* tree);
 bool    is_cycles                   (Node* node);
@@ -112,8 +126,12 @@ void    get_points                  (Node* node, Node** points, size_t pos);
 int     comparator                  (const void* p1, const void* p2);
 bool    read_func                   (ReadStr* str, Node** node);
 bool    read_oper                   (ReadStr* str, Node** node);
-bool    read_var                    (ReadStr* str, Node** node);
+Error   read_var                    (ReadStr* str, Node** node, Vars* vars);
 bool    read_num                    (ReadStr* str, Node** node);
 bool    is_zero                     (double x);
+Error   vars_dtor                   (Vars* vars);
+Error   append_var                  (Vars* vars, char* name);
+bool    found_var                   (Vars* vars, char* name);
+
 
 #endif //TREE_HEADER

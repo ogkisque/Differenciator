@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10) (preloaded format=pdflatex 2023.11.26)  1 DEC 2023 00:47
+This is pdfTeX, Version 3.141592653-2.6-1.40.25 (MiKTeX 23.10) (preloaded format=pdflatex 2023.11.26)  1 DEC 2023 17:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
-**./latex.tex
-(latex.tex
+**./latex/latex.tex
+(latex/latex.tex
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-08-29>
 (C:\Users\sensa\AppData\Local\Programs\MiKTeX\tex/latex/base\article.cls
@@ -628,161 +628,160 @@ LaTeX Font Info:    Trying to load font information for U+wasy on input line 13
 (C:\Users\sensa\AppData\Local\Programs\MiKTeX\tex/latex/wasysym\uwasy.fd
 File: uwasy.fd 2020/01/19 v2.4 Wasy-2 symbol font definitions
 )
+
+pdfTeX warning: pdflatex (file ./latex/graph1.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+<latex/graph1.pdf, id=1, 568.1225pt x 426.59375pt>
+File: latex/graph1.pdf Graphic file (type pdf)
+<use latex/graph1.pdf>
+Package pdftex.def Info: latex/graph1.pdf  used on input line 58.
+(pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
+
+
+pdfTeX warning: pdflatex (file ./latex/graph1.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+File: latex/graph1.pdf Graphic file (type pdf)
+<use latex/graph1.pdf>
+Package pdftex.def Info: latex/graph1.pdf  used on input line 58.
+(pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
+
+
+pdfTeX warning: pdflatex (file ./latex/graph1.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+
+
+pdfTeX warning: pdflatex (file ./latex/graph1.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+<latex/graph1.pdf, id=4, page=1, 568.1225pt x 426.59375pt>
+File: latex/graph1.pdf Graphic file (type pdf)
+<use latex/graph1.pdf, page 1>
+Package pdftex.def Info: latex/graph1.pdf , page1 used on input line 58.
+(pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
+File: latex/graph1.pdf Graphic file (type pdf)
+<use latex/graph1.pdf, page 1>
+Package pdftex.def Info: latex/graph1.pdf , page1 used on input line 58.
+(pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
 [1
 
 {C:/Users/sensa/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
+File: latex/graph1.pdf Graphic file (type pdf)
+<use latex/graph1.pdf, page 1>
+Package pdftex.def Info: latex/graph1.pdf , page1 used on input line 58.
+(pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
+File: latex/graph1.pdf Graphic file (type pdf)
+<use latex/graph1.pdf, page 1>
+Package pdftex.def Info: latex/graph1.pdf , page1 used on input line 58.
+(pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
+File: latex/graph1.pdf Graphic file (type pdf)
+<use latex/graph1.pdf, page 1>
+Package pdftex.def Info: latex/graph1.pdf , page1 used on input line 58.
+(pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
+ [2 <./latex/graph1.pdf>]
 
-pdfTeX warning: pdflatex (file ./graph1.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-<graph1.pdf, id=12, 568.1225pt x 426.59375pt>
-File: graph1.pdf Graphic file (type pdf)
-<use graph1.pdf>
-Package pdftex.def Info: graph1.pdf  used on input line 70.
+pdfTeX warning: pdflatex (file ./latex/graph2.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+<latex/graph2.pdf, id=35, 568.1225pt x 426.59375pt>
+File: latex/graph2.pdf Graphic file (type pdf)
+<use latex/graph2.pdf>
+Package pdftex.def Info: latex/graph2.pdf  used on input line 58.
 (pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
 
 
-pdfTeX warning: pdflatex (file ./graph1.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-File: graph1.pdf Graphic file (type pdf)
-<use graph1.pdf>
-Package pdftex.def Info: graph1.pdf  used on input line 70.
+pdfTeX warning: pdflatex (file ./latex/graph2.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+File: latex/graph2.pdf Graphic file (type pdf)
+<use latex/graph2.pdf>
+Package pdftex.def Info: latex/graph2.pdf  used on input line 58.
 (pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
 
 
-pdfTeX warning: pdflatex (file ./graph1.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
+pdfTeX warning: pdflatex (file ./latex/graph2.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
 
 
-pdfTeX warning: pdflatex (file ./graph1.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-<graph1.pdf, id=15, page=1, 568.1225pt x 426.59375pt>
-File: graph1.pdf Graphic file (type pdf)
-<use graph1.pdf, page 1>
-Package pdftex.def Info: graph1.pdf , page1 used on input line 70.
+pdfTeX warning: pdflatex (file ./latex/graph2.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+<latex/graph2.pdf, id=38, page=1, 568.1225pt x 426.59375pt>
+File: latex/graph2.pdf Graphic file (type pdf)
+<use latex/graph2.pdf, page 1>
+Package pdftex.def Info: latex/graph2.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
-File: graph1.pdf Graphic file (type pdf)
-<use graph1.pdf, page 1>
-Package pdftex.def Info: graph1.pdf , page1 used on input line 70.
+File: latex/graph2.pdf Graphic file (type pdf)
+<use latex/graph2.pdf, page 1>
+Package pdftex.def Info: latex/graph2.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-[2]
-File: graph1.pdf Graphic file (type pdf)
-<use graph1.pdf, page 1>
-Package pdftex.def Info: graph1.pdf , page1 used on input line 70.
+File: latex/graph2.pdf Graphic file (type pdf)
+<use latex/graph2.pdf, page 1>
+Package pdftex.def Info: latex/graph2.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-File: graph1.pdf Graphic file (type pdf)
-<use graph1.pdf, page 1>
-Package pdftex.def Info: graph1.pdf , page1 used on input line 70.
+File: latex/graph2.pdf Graphic file (type pdf)
+<use latex/graph2.pdf, page 1>
+Package pdftex.def Info: latex/graph2.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-File: graph1.pdf Graphic file (type pdf)
-<use graph1.pdf, page 1>
-Package pdftex.def Info: graph1.pdf , page1 used on input line 70.
+File: latex/graph2.pdf Graphic file (type pdf)
+<use latex/graph2.pdf, page 1>
+Package pdftex.def Info: latex/graph2.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
- [3 <./graph1.pdf>]
+[3 <./latex/graph2.pdf>]
 
-pdfTeX warning: pdflatex (file ./graph2.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-<graph2.pdf, id=38, 568.1225pt x 426.59375pt>
-File: graph2.pdf Graphic file (type pdf)
-<use graph2.pdf>
-Package pdftex.def Info: graph2.pdf  used on input line 70.
-(pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
-
-
-pdfTeX warning: pdflatex (file ./graph2.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-File: graph2.pdf Graphic file (type pdf)
-<use graph2.pdf>
-Package pdftex.def Info: graph2.pdf  used on input line 70.
+pdfTeX warning: pdflatex (file ./latex/graph3.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+<latex/graph3.pdf, id=57, 568.1225pt x 426.59375pt>
+File: latex/graph3.pdf Graphic file (type pdf)
+<use latex/graph3.pdf>
+Package pdftex.def Info: latex/graph3.pdf  used on input line 58.
 (pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
 
 
-pdfTeX warning: pdflatex (file ./graph2.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-
-
-pdfTeX warning: pdflatex (file ./graph2.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-<graph2.pdf, id=41, page=1, 568.1225pt x 426.59375pt>
-File: graph2.pdf Graphic file (type pdf)
-<use graph2.pdf, page 1>
-Package pdftex.def Info: graph2.pdf , page1 used on input line 70.
-(pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
-File: graph2.pdf Graphic file (type pdf)
-<use graph2.pdf, page 1>
-Package pdftex.def Info: graph2.pdf , page1 used on input line 70.
-(pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-File: graph2.pdf Graphic file (type pdf)
-<use graph2.pdf, page 1>
-Package pdftex.def Info: graph2.pdf , page1 used on input line 70.
-(pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-File: graph2.pdf Graphic file (type pdf)
-<use graph2.pdf, page 1>
-Package pdftex.def Info: graph2.pdf , page1 used on input line 70.
-(pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-File: graph2.pdf Graphic file (type pdf)
-<use graph2.pdf, page 1>
-Package pdftex.def Info: graph2.pdf , page1 used on input line 70.
-(pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-[4 <./graph2.pdf>]
-
-pdfTeX warning: pdflatex (file ./graph3.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-<graph3.pdf, id=60, 568.1225pt x 426.59375pt>
-File: graph3.pdf Graphic file (type pdf)
-<use graph3.pdf>
-Package pdftex.def Info: graph3.pdf  used on input line 70.
+pdfTeX warning: pdflatex (file ./latex/graph3.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+File: latex/graph3.pdf Graphic file (type pdf)
+<use latex/graph3.pdf>
+Package pdftex.def Info: latex/graph3.pdf  used on input line 58.
 (pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
 
 
-pdfTeX warning: pdflatex (file ./graph3.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-File: graph3.pdf Graphic file (type pdf)
-<use graph3.pdf>
-Package pdftex.def Info: graph3.pdf  used on input line 70.
+pdfTeX warning: pdflatex (file ./latex/graph3.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+
+
+pdfTeX warning: pdflatex (file ./latex/graph3.pdf): PDF inclusion: found PDF ve
+rsion <1.7>, but at most version <1.5> allowed
+<latex/graph3.pdf, id=60, page=1, 568.1225pt x 426.59375pt>
+File: latex/graph3.pdf Graphic file (type pdf)
+<use latex/graph3.pdf, page 1>
+Package pdftex.def Info: latex/graph3.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
-
-
-pdfTeX warning: pdflatex (file ./graph3.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-
-
-pdfTeX warning: pdflatex (file ./graph3.pdf): PDF inclusion: found PDF version 
-<1.7>, but at most version <1.5> allowed
-<graph3.pdf, id=63, page=1, 568.1225pt x 426.59375pt>
-File: graph3.pdf Graphic file (type pdf)
-<use graph3.pdf, page 1>
-Package pdftex.def Info: graph3.pdf , page1 used on input line 70.
-(pdftex.def)             Requested size: 568.1211pt x 426.5927pt.
-File: graph3.pdf Graphic file (type pdf)
-<use graph3.pdf, page 1>
-Package pdftex.def Info: graph3.pdf , page1 used on input line 70.
+File: latex/graph3.pdf Graphic file (type pdf)
+<use latex/graph3.pdf, page 1>
+Package pdftex.def Info: latex/graph3.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-File: graph3.pdf Graphic file (type pdf)
-<use graph3.pdf, page 1>
-Package pdftex.def Info: graph3.pdf , page1 used on input line 70.
+File: latex/graph3.pdf Graphic file (type pdf)
+<use latex/graph3.pdf, page 1>
+Package pdftex.def Info: latex/graph3.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-File: graph3.pdf Graphic file (type pdf)
-<use graph3.pdf, page 1>
-Package pdftex.def Info: graph3.pdf , page1 used on input line 70.
+File: latex/graph3.pdf Graphic file (type pdf)
+<use latex/graph3.pdf, page 1>
+Package pdftex.def Info: latex/graph3.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-File: graph3.pdf Graphic file (type pdf)
-<use graph3.pdf, page 1>
-Package pdftex.def Info: graph3.pdf , page1 used on input line 70.
+File: latex/graph3.pdf Graphic file (type pdf)
+<use latex/graph3.pdf, page 1>
+Package pdftex.def Info: latex/graph3.pdf , page1 used on input line 58.
 (pdftex.def)             Requested size: 597.62982pt x 448.7503pt.
-[5 <./graph3.pdf>] (latex.aux)
+[4 <./latex/graph3.pdf>] (latex.aux)
  ***********
 LaTeX2e <2023-06-01> patch level 1
 L3 programming layer <2023-08-29>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 7201 strings out of 475247
- 110967 string characters out of 5757791
+ 7203 strings out of 475247
+ 111236 string characters out of 5757791
  1925785 words of memory out of 5000000
  28618 multiletter control sequences out of 15000+600000
  568840 words of font info for 69 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 72i,17n,79p,286b,521s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,17n,79p,292b,523s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\sensa\AppData\Local\MiKTeX\fonts/pk/ljfour/lh/lh-t2a/dpi600\larm12
 00.pk> <C:\Users\sensa\AppData\Local\MiKTeX\fonts/pk/ljfour/lh/lh-t2a/dpi600\la
 rm1728.pk> <C:\Users\sensa\AppData\Local\MiKTeX\fonts/pk/ljfour/lh/lh-t2a/dpi60
@@ -792,9 +791,9 @@ lic/amsfonts/cm/cmmi12.pfb><C:/Users/sensa/AppData/Local/Programs/MiKTeX/fonts/
 type1/public/amsfonts/cm/cmr12.pfb><C:/Users/sensa/AppData/Local/Programs/MiKTe
 X/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/sensa/AppData/Local/Progra
 ms/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
-Output written on latex.pdf (5 pages, 142764 bytes).
+Output written on latex.pdf (4 pages, 139593 bytes).
 PDF statistics:
- 184 PDF objects out of 1000 (max. 8388607)
+ 179 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  61 words of extra memory for PDF output out of 10000 (max. 10000000)
 
