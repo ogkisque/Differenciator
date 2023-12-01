@@ -4,5 +4,5 @@ set grid xtics ytics mxtics mytics
 set xlabel 'x' font 'Sans,20'
 set ylabel 'f(x)' font 'Sans,20'
 set title 'Сравнение графиков функции и её разложения' font 'Sans,25'
-plot [-0.900000:0.900000] ((sin(x))*(cos((2.000)*(x)))), ((x)+(((-13.000)*((x)**(3.000)))/(6.000)))
+plot [-1.200000:1.200000] ((sin(x))*(cos((2.000)*(x)))), (((x)+(((-13.000)*((x)**(3.000)))/(6.000)))+(((121.000)*((x)**(5.000)))/(120.000)))
 set term pop

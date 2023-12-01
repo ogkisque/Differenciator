@@ -1,3 +1,7 @@
+#include "diff.h"
+#include "dump.h"
+#include "graph.h"
+#include "latex.h"
 #include "tree.h"
 
 #define VERIFY(tree)                            \
