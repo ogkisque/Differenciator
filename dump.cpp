@@ -65,6 +65,7 @@ void nodes_graph_dump (const Node* node, size_t counter)
         dtNodeStyle ().fillcolor ("#4871FC");
     else if (node->type == FUNC)
         dtNodeStyle ().fillcolor ("#F9FF15");
+
     val_to_str (node, text);
     dtNode ((int) counter, text);
     if (node->left)
@@ -104,4 +105,13 @@ void error_graph_dump (const Tree* tree, Error error)
                 error.message, error.code, error.file, error.func, error.line);
 
     dtNode (0, text);
+}
+
+void str_dump (const ReadStr* str, Error error)
+{
+    printf (RED_COL);
+    print_error (error);
+    printf ("str = <%s>\n, pos = %llu\n, str after pos = %s\n",
+            str->str, str->pos, str->str + str->pos);
+    printf (OFF_COL);
 }

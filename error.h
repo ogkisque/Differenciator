@@ -4,6 +4,9 @@
 #define RETURN_ERROR(code, message) \
         return Error {code, __LINE__, __FILE__, __func__, message}
 
+#define GET_ERROR(code, message) \
+        Error {code, __LINE__, __FILE__, __func__, message}
+
 enum Error_codes
 {
     CORRECT =           0,
@@ -21,7 +24,8 @@ enum Error_codes
     PREV_OF_NEXT =      12,
     LIST_OVERFLOW =     13,
     POS_MORE_SIZE =     14,
-    VARS_OVERFLOW =     15
+    VARS_OVERFLOW =     15,
+    SYNTAX_ERR =        16
 };
 
 struct Error

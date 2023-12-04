@@ -69,11 +69,13 @@ Node* dif (const Node* node, FILE* file, const char* var_name, bool need_latex)
                             _D(_RIGHT));
                 break;
             case POW:
-                if (LTYP == NUM && RTYP != NUM)
+                if ((LTYP == NUM || (LTYP == VAR && strcmp (node->left->name, var_name) != 0))
+                    && RTYP != NUM)
                     tmp = _MUL(_MUL(_LN(NULL, _COPY(_LEFT)), _COPY(node)),
                                 _D(_RIGHT));
-                else if (RTYP == NUM && LTYP != NUM)
-                    tmp = _MUL(_MUL(_COPY(_RIGHT), _POW(_COPY(_LEFT), _NUM(RVAL - 1))),
+                else if ((RTYP == NUM || (RTYP == VAR && strcmp (node->right->name, var_name) != 0))
+                        && (LTYP != NUM))
+                    tmp = _MUL(_MUL(_COPY(_RIGHT), _POW(_COPY(_LEFT), _SUB(_COPY(_RIGHT), _NUM(1)))),
                                 _D(_LEFT));
                 else
                     tmp = _MUL(_COPY(node), _D(_MUL(_COPY(_RIGHT), _LN(NULL, _COPY(_LEFT)))));
@@ -134,9 +136,9 @@ Node* dif (const Node* node, FILE* file, const char* var_name, bool need_latex)
 
     if (need_latex)
     {
-        print_latex_func (node, file, var_name);
+        print_latex_func (node, file, var_name, "g");
         print_latex_phrase (file);
-        print_latex_trans (tmp, file, var_name);
+        print_latex_trans (tmp, file, var_name, "g");
     }
 
     return tmp;

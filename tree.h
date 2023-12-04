@@ -115,7 +115,7 @@ Error   tree_dtor                   (Tree* tree);
 Error   read_file                   (FILE* file, ReadStr* str);
 Error   nodes_print                 (const Node* node, FILE* file);
 void    val_to_str                  (const Node* node, char* str);
-Error   nodes_read                  (Tree* tree, Node** node, ReadStr* str, Vars* vars);
+//Error   nodes_read                  (Tree* tree, Node** node, ReadStr* str, Vars* vars);
 Error   read_value                  (ReadStr* str, Node** node, Vars* vars);
 Error   new_node                    (Types type, double value, char* name, Node** adres);
 Error   node_ctor                   (Types type, double value, char* name, Node* node);

@@ -48,9 +48,9 @@ void print_latex_end (FILE* file)
     "\\end{document}");
 }
 
-void print_latex_trans (const Node* node, FILE* file, const char* var_name)
+void print_latex_trans (const Node* node, FILE* file, const char* var_name, const char* func_name)
 {
-    fprintf (file, "$f^{'}(%s) = ", var_name);
+    fprintf (file, "$%s^{'}(%s) = ", func_name, var_name);
     print_form (node, file);
     fprintf (file, "$\n\n");
 }
@@ -175,9 +175,9 @@ void generate_pdf (const char* file_name)
     system (text);
 }
 
-void print_latex_func_vars (const Node* node, FILE* file, Vars* vars)
+void print_latex_func_vars (const Node* node, FILE* file, Vars* vars, const char* func_name)
 {
-    fprintf (file, "$f(");
+    fprintf (file, "$%s(", func_name);
     for (int i = 0; i < vars->num_vars; i++)
     {
         fprintf (file, "%s", vars->vars[i].name);
@@ -189,9 +189,9 @@ void print_latex_func_vars (const Node* node, FILE* file, Vars* vars)
     fprintf (file, "$\n\n");
 }
 
-void print_latex_func (const Node* node, FILE* file, const char* var_name)
+void print_latex_func (const Node* node, FILE* file, const char* var_name, const char* func_name)
 {
-    fprintf (file, "$f(%s) = ", var_name);
+    fprintf (file, "$%s(%s) = ", func_name, var_name);
     print_form (node, file);
     fprintf (file, "$\n\n");
 }

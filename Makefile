@@ -9,7 +9,7 @@ CFLAGS = -c -g -Wshadow -Winit-self -Wredundant-decls -Wcast-align\
 -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG -D_EJUDGE_CLIENT_SIDE
 
 OBJDIR = obj
-OBJ = $(OBJDIR)/main.o $(OBJDIR)/tree.o $(OBJDIR)/dump.o $(OBJDIR)/latex.o $(OBJDIR)/graph.o $(OBJDIR)/diff.o
+OBJ = $(OBJDIR)/main.o $(OBJDIR)/tree.o $(OBJDIR)/dump.o $(OBJDIR)/latex.o $(OBJDIR)/graph.o $(OBJDIR)/diff.o $(OBJDIR)/read.o
 
 all: diff.exe
 

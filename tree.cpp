@@ -180,6 +180,7 @@ void val_to_str (const Node* node, char* str)
     }
 }
 
+/*
 Error nodes_read (Tree* tree, Node** node, ReadStr* str, Vars* vars)
 {
     if (!str)
@@ -205,6 +206,7 @@ Error nodes_read (Tree* tree, Node** node, ReadStr* str, Vars* vars)
     str->pos += 2;
     return error;
 }
+*/
 
 Error read_value (ReadStr* str, Node** node, Vars* vars)
 {
@@ -382,6 +384,7 @@ Error read_file (FILE* file, ReadStr* str)
 
     str->size = fread (str->str, sizeof (char), MAX_STR_SIZE, file);
     str->pos = 0;
+    str->str[str->size - 1] = '\0';
     RETURN_ERROR (CORRECT, "");
 }
 
