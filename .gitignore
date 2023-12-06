@@ -3,5 +3,7 @@ obj
 Graph.jpg
 *.dot
 .vscode
-
+latex.aux
+latex.log
+latex
 
