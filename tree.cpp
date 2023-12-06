@@ -171,6 +171,9 @@ void val_to_str (const Node* node, char* str)
             case SUB:
                 sprintf (str, " - ");
                 return;
+            case UNSUB:
+                sprintf (str, " - ");
+                return;
             case DIV:
                 sprintf (str, " / ");
                 return;
@@ -178,166 +181,6 @@ void val_to_str (const Node* node, char* str)
                 return;
         }
     }
-}
-
-/*
-Error nodes_read (Tree* tree, Node** node, ReadStr* str, Vars* vars)
-{
-    if (!str)
-        RETURN_ERROR(NULL_POINTER, "Null pointer of str.");
-
-    if (str->pos > str->size)
-        RETURN_ERROR(POS_MORE_SIZE, "Position in str is more than its size.");
-
-    char text[MAX_SIZE] = "";
-    sscanf (str->str + str->pos, "%s", text);
-    if (strcmp (text, "(") != 0)
-        RETURN_ERROR(CORRECT, "");
-
-    tree->size++;
-    str->pos += 2;
-    Error error = new_node (NUM, 0, NULL, node);
-
-    nodes_read (tree, &((*node)->left), str, vars);
-
-    error = read_value (str, node, vars);
-
-    nodes_read (tree, &((*node)->right), str, vars);
-    str->pos += 2;
-    return error;
-}
-*/
-
-Error read_value (ReadStr* str, Node** node, Vars* vars)
-{
-    if (read_num  (str, node)) RETURN_ERROR(CORRECT, "");
-    if (read_oper (str, node)) RETURN_ERROR(CORRECT, "");
-    if (read_func (str, node)) RETURN_ERROR(CORRECT, "");
-    return read_var (str, node, vars);
-}
-
-bool read_func (ReadStr* str, Node** node)
-{
-    char text[MAX_SIZE] = "";
-    int num_read = 0;
-    sscanf (str->str + str->pos, "%s%n", text, &num_read);
-    bool is_func = false;
-    if (strcmp (text, "cos") == 0)
-    {
-        is_func = true;
-        (*node)->left = NULL;
-        (*node)->value = COS;
-    }
-    else if (strcmp (text, "sin") == 0)
-    {
-        is_func = true;
-        (*node)->left = NULL;
-        (*node)->value = SIN;
-    }
-    else if (strcmp (text, "^") == 0)
-    {
-        is_func = true;
-        (*node)->value = POW;
-    }
-    else if (strcmp (text, "sqrt") == 0)
-    {
-        is_func = true;
-        (*node)->left = NULL;
-        (*node)->value = SQRT;
-    }
-    else if (strcmp (text, "ln") == 0)
-    {
-        is_func = true;
-        (*node)->left = NULL;
-        (*node)->value = LN;
-    }
-    else if (strcmp (text, "tg") == 0)
-    {
-        is_func = true;
-        (*node)->left = NULL;
-        (*node)->value = TG;
-    }
-    else if (strcmp (text, "arcsin") == 0)
-    {
-        is_func = true;
-        (*node)->left = NULL;
-        (*node)->value = ARCSIN;
-    }
-    else if (strcmp (text, "arccos") == 0)
-    {
-        is_func = true;
-        (*node)->left = NULL;
-        (*node)->value = ARCCOS;
-    }
-    else if (strcmp (text, "arctg") == 0)
-    {
-        is_func = true;
-        (*node)->left = NULL;
-        (*node)->value = ARCTG;
-    }
-
-    if (is_func)
-    {
-        str->pos += num_read + 1;
-        (*node)->type = FUNC;
-    }
-    return is_func;
-}
-
-bool read_oper (ReadStr* str, Node** node)
-{
-    char text[MAX_SIZE] = "";
-    int num_read = 0;
-    sscanf (str->str + str->pos, "%s%n", text, &num_read);
-    bool is_oper = false;
-    if (strcmp (text, "+") == 0)
-    {
-        is_oper = true;
-        (*node)->value = ADD;
-    }
-    else if (strcmp (text, "*") == 0)
-    {
-        is_oper = true;
-        (*node)->value = MUL;
-    }
-    else if (strcmp (text, "-") == 0)
-    {
-        is_oper = true;
-        (*node)->value = SUB;
-    }
-    else if (strcmp (text, "/") == 0)
-    {
-        is_oper = true;
-        (*node)->value = DIV;
-    }
-
-    if (is_oper)
-    {
-        str->pos += num_read + 1;
-        (*node)->type = OPER;
-    }
-    return is_oper;
-}
-
-Error read_var (ReadStr* str, Node** node, Vars* vars)
-{
-    char text[MAX_SIZE] = "";
-    int num_read = 0;
-    sscanf (str->str + str->pos, "%s%n", text, &num_read);
-
-    if  (strcmp (text, ")") == 0 || strcmp (text, "(") == 0)
-        RETURN_ERROR(CORRECT, "");
-
-    str->pos += num_read + 1;
-    (*node)->type  = VAR;
-    (*node)->value = VAR_DEF_VAL;
-    (*node)->name  = strdup (text);
-    if (!((*node)->name))
-        RETURN_ERROR(MEM_ALLOC, "Error of allocation memory for name of var");
-
-    if (!found_var (vars, text))
-        return append_var (vars, text);
-    RETURN_ERROR(CORRECT, "");
 }
 
 bool found_var (Vars* vars, char* name)
@@ -361,20 +204,6 @@ Error append_var (Vars* vars, char* name)
 
     vars->num_vars++;
     RETURN_ERROR(CORRECT, "");
-}
-
-bool read_num (ReadStr* str, Node** node)
-{
-    int num_read = 0;
-    double value = 0;
-    if (sscanf (str->str + str->pos, "%lf%n", &value, &num_read) == 1)
-    {
-        (*node)->type = NUM;
-        (*node)->value = value;
-        str->pos += num_read + 1;
-        return true;
-    }
-    return false;
 }
 
 Error read_file (FILE* file, ReadStr* str)

@@ -45,7 +45,7 @@ void val_to_str_graph (const Node* node, char* str)
 {
     if (node->type == NUM)
     {
-        sprintf (str, "%.3lf", node->value);
+        sprintf (str, "%.3lg", node->value);
         return;
     }
 

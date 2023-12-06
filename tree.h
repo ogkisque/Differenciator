@@ -52,10 +52,14 @@ enum Types
 
 enum Opers
 {
-    ADD = 1,
-    MUL = 2,
-    SUB = 3,
-    DIV = 4
+    ADD =       1,
+    MUL =       2,
+    SUB =       3,
+    DIV =       4,
+    LBRAC =     5,
+    RBRAC =     6,
+    END =       7,
+    UNSUB =     8
 };
 
 enum Funcs
@@ -110,13 +114,18 @@ struct ReadStr
     size_t  size;
 };
 
+struct Tokens
+{
+    Node** tokens;
+    size_t size;
+    size_t pos;
+};
+
 Error   tree_ctor                   (Tree* tree, const char* name, const char* file, const char* func, int line);
 Error   tree_dtor                   (Tree* tree);
 Error   read_file                   (FILE* file, ReadStr* str);
 Error   nodes_print                 (const Node* node, FILE* file);
 void    val_to_str                  (const Node* node, char* str);
-//Error   nodes_read                  (Tree* tree, Node** node, ReadStr* str, Vars* vars);
-Error   read_value                  (ReadStr* str, Node** node, Vars* vars);
 Error   new_node                    (Types type, double value, char* name, Node** adres);
 Error   node_ctor                   (Types type, double value, char* name, Node* node);
 void    nodes_dtor                  (Node* node);
@@ -124,14 +133,9 @@ Error   tree_verify                 (const Tree* tree);
 bool    is_cycles                   (Node* node);
 void    get_points                  (Node* node, Node** points, size_t pos);
 int     comparator                  (const void* p1, const void* p2);
-bool    read_func                   (ReadStr* str, Node** node);
-bool    read_oper                   (ReadStr* str, Node** node);
-Error   read_var                    (ReadStr* str, Node** node, Vars* vars);
-bool    read_num                    (ReadStr* str, Node** node);
 bool    is_zero                     (double x);
 Error   vars_dtor                   (Vars* vars);
 Error   append_var                  (Vars* vars, char* name);
 bool    found_var                   (Vars* vars, char* name);
-
 
 #endif //TREE_HEADER

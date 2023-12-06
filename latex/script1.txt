@@ -4,5 +4,5 @@ set grid xtics ytics mxtics mytics
 set xlabel 'x' font 'Sans,20'
 set ylabel 'f(x)' font 'Sans,20'
 set title 'График и касательная' font 'Sans,25'
-plot [-2.000000:8.000000] (log((sin(x))+(1.000))), ((0.132)+((-0.868)*((x)-(3.000))))
+plot [-11.000000:-1.000000] (log((sin(atan(x)))+(1))), ((-4.3)+((0.327)*((x)-(-6))))
 set term pop

@@ -14,6 +14,7 @@
 #define _MUL(left, right)       create_node (OPER,  MUL,            NULL, left, right)
 #define _DIV(left, right)       create_node (OPER,  DIV,            NULL, left, right)
 #define _SUB(left, right)       create_node (OPER,  SUB,            NULL, left, right)
+#define _UNSUB(left, right)     create_node (OPER,  UNSUB,          NULL, left, right)
 #define _COS(left, right)       create_node (FUNC,  COS,            NULL, left, right)
 #define _SIN(left, right)       create_node (FUNC,  SIN,            NULL, left, right)
 #define _SQRT(left, right)      create_node (FUNC,  SQRT,           NULL, left, right)
@@ -25,6 +26,9 @@
 #define _ARCTG(left, right)     create_node (FUNC,  ARCTG,          NULL, left, right)
 #define _NUM(value)             create_node (NUM,   value,          NULL, NULL, NULL)
 #define _VAR(name)              create_node (VAR,   VAR_DEF_VAL,    name, NULL, NULL)
+#define _LBRAC                  create_node (OPER,  LBRAC,          NULL, NULL, NULL)
+#define _RBRAC                  create_node (OPER,  RBRAC,          NULL, NULL, NULL)
+#define _END                    create_node (OPER,  END,            NULL, NULL, NULL)
 #define _LEFT                   node->left
 #define _RIGHT                  node->right
 #define _COPY(node)             copy_node (node)

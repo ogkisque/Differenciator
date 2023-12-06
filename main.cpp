@@ -33,9 +33,9 @@ int main ()
     read_file (file, &str);
     fclose (file);
     error = nodes_read (&(func.root), &str, &vars);
+
     //tree_graph_dump (&func, error);
     simple (&func);
-
 
     print_latex_func_vars (func.root, file_latex, &vars, "f");
 
@@ -52,6 +52,5 @@ int main ()
     vars_dtor (&vars);
 
     fclose (file_latex);
-
     return 0;
 }

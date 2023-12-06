@@ -63,9 +63,9 @@ void print_form (const Node* node, FILE* file)
     if (node->type == NUM)
     {
         if (node->value < 0)
-            fprintf (file, "(%.3lf)", node->value);
+            fprintf (file, "(%.3lg)", node->value);
         else
-            fprintf (file, "%.3lf", node->value);
+            fprintf (file, "%.3lg", node->value);
         return;
     }
 
